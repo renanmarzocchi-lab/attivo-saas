@@ -1,0 +1,66 @@
+# docker-compose.prod.yml — Attivo SaaS Produção
+#
+# Uso:
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Este compose sobe APENAS a infraestrutura (PostgreSQL + Redis).
+# Backend e frontend rodam diretamente via PM2 (fora do Docker),
+# permitindo deploy incremental sem rebuild de imagem.
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: attivo_postgres
+    environment:
+      POSTGRES_DB:       attivo_saas
+      POSTGRES_USER:     attivo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env}
+    ports:
+      - "127.0.0.1:5432:5432"   # Expõe apenas para localhost (não para internet)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test:     ["CMD-SHELL", "pg_isready -U attivo -d attivo_saas"]
+      interval: 10s
+      timeout:  5s
+      retries:  10
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: attivo_redis
+    command: >
+      redis-server
+      --save 60 1
+      --loglevel warning
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD:-}
+    ports:
+      - "127.0.0.1:6379:6379"   # Expõe apenas para localhost
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test:     ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

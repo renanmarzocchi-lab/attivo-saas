@@ -1,0 +1,113 @@
+# .github/workflows/deploy.yml
+# CI/CD — Attivo SaaS
+#
+# Disparo:
+#   - Push na branch 'main' (deploy automático)
+#   - Workflow manual via GitHub Actions UI (deploy sob demanda)
+#
+# O que faz:
+#   1. Testa o backend (npm test)
+#   2. Conecta na VPS via SSH
+#   3. Executa scripts/deploy.sh na VPS
+#
+# Secrets necessários no GitHub (Settings → Secrets → Actions):
+#   VPS_HOST     — IP ou hostname da VPS  (ex: 123.456.789.0)
+#   VPS_USER     — usuário SSH            (ex: root)
+#   VPS_SSH_KEY  — chave SSH privada      (cat ~/.ssh/id_rsa)
+#
+# Como configurar a chave SSH:
+#   # Na VPS:
+#   ssh-keygen -t ed25519 -C "github-deploy" -f ~/.ssh/github_deploy -N ""
+#   cat ~/.ssh/github_deploy.pub >> ~/.ssh/authorized_keys
+#   # No GitHub Secrets: cole o conteúdo de ~/.ssh/github_deploy (chave PRIVADA)
+
+name: Deploy Attivo SaaS
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Pular testes (emergência)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  # ─── JOB 1: Testes ─────────────────────────────────────────────────────────
+  test:
+    name: Testes Backend
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.skip_tests != 'true' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependências
+        run: cd backend && npm ci
+
+      - name: Rodar testes
+        run: cd backend && node --experimental-vm-modules src/tests/scoring.test.js
+        # Em caso de falha: o deploy não acontece
+
+  # ─── JOB 2: Deploy ─────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy para Produção
+    runs-on: ubuntu-latest
+    needs: test
+    # Roda mesmo se 'test' foi pulado (skip_tests=true)
+    if: always() && (needs.test.result == 'success' || needs.test.result == 'skipped')
+
+    environment:
+      name: production
+      url: https://attivocorretora.com.br
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar SSH client
+        run: sudo apt-get install -y openssh-client
+
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Adiciona o host à lista de conhecidos (evita prompt de confirmação)
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy na VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=30 \
+              "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+              "bash /opt/attivo/scripts/deploy.sh"
+
+      - name: Verificar saúde pós-deploy
+        run: |
+          sleep 8
+          STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
+            "https://api.attivocorretora.com.br/ready" || echo "000")
+          BODY=$(curl -sk "https://api.attivocorretora.com.br/ready" || echo "{}")
+          echo "HTTP $STATUS"
+          echo "$BODY"
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "206" ]; then
+            echo "::error::Deploy pode ter falhado — HTTP $STATUS"
+            exit 1
+          fi
+          echo "::notice::Deploy OK — $BODY"
+
+      - name: Limpar chave SSH
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
