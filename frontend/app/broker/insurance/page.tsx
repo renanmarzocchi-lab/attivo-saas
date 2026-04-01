@@ -18,8 +18,8 @@ const STAGE_COLOR: Record<string, string> = {
   APOLICE_EMITIDA: '#16a34a', PERDIDO: '#ef4444', CANCELADO: '#9ca3af',
 };
 
-interface Record { id: string; type: string; stage: string; insurer?: string; status: string; customerName: string; premiumAmount?: number; endDate?: string; owner: { name: string }; createdAt: string; }
-interface Res { data: Record[]; meta: { total: number; page: number; pages: number } }
+interface InsuranceRecord { id: string; type: string; stage: string; insurer?: string; status: string; customerName: string; premiumAmount?: number; endDate?: string; owner: { name: string }; createdAt: string; }
+interface Res { data: InsuranceRecord[]; meta: { total: number; page: number; pages: number } }
 
 export default function BrokerInsurance() {
   const [res, setRes]       = useState<Res | null>(null);

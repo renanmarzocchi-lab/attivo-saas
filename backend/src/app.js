@@ -40,13 +40,20 @@ export function buildApp() {
   });
 
   // ── Segurança ──────────────────────────────────────────────────────────────
-  app.register(helmet, {
-    contentSecurityPolicy: false, // API pura, sem HTML
-  });
-
   app.register(cors, {
-    origin:      env.CORS_ORIGIN,
-    credentials: true,
+  origin: (origin, cb) => {
+    const allowed = (env.CORS_ORIGIN || '')
+      .split(',')
+      .map(o => o.trim());
+
+    if (!origin || allowed.includes(origin)) {
+      cb(null, true);
+      return;
+    }
+
+    cb(new Error('Not allowed by CORS'), false);
+  },
+  credentials: true,
   });
 
   // ── Rate limit — in-memory (sem Redis)
