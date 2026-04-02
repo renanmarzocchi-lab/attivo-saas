@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '../../../lib/api';
-import { fmt } from '../../../lib/formatting';
+import { fmt, affiliateStatusColor, affiliateStatusLabel } from '../../../lib/formatting';
 
 interface BusinessStats { total: number; policies: number; premiumTotal: number; conversionRate: number; }
 interface DashData {
@@ -43,8 +43,8 @@ export default function AffiliateDashboard() {
         <span style={{ background: '#dbeafe', color: '#1d4ed8', padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 600, fontFamily: 'monospace' }}>
           {data.refCode}
         </span>
-        <span style={{ background: '#dcfce7', color: '#16a34a', padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>
-          {data.status}
+        <span style={{ background: '#f3f4f6', color: affiliateStatusColor[data.status] ?? '#16a34a', padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>
+          {affiliateStatusLabel[data.status] ?? data.status}
         </span>
       </div>
 

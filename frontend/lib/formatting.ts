@@ -14,6 +14,14 @@ export const affiliateStatusColor: Record<string, string> = {
   BLOCKED:  '#6b7280',
 };
 
+/** Labels pt-BR para status de afiliado */
+export const affiliateStatusLabel: Record<string, string> = {
+  ACTIVE:   'Ativo',
+  PENDING:  'Pendente',
+  REJECTED: 'Rejeitado',
+  BLOCKED:  'Bloqueado',
+};
+
 /** Mapeamento de cor por status de comissão */
 export const commissionStatusColor: Record<string, string> = {
   PENDING:   '#d97706',
@@ -22,12 +30,42 @@ export const commissionStatusColor: Record<string, string> = {
   CANCELED:  '#9ca3af',
 };
 
+/** Labels pt-BR para status de comissão */
+export const commissionStatusLabel: Record<string, string> = {
+  PENDING:   'Pendente',
+  AVAILABLE: 'Disponível',
+  PAID:      'Pago',
+  CANCELED:  'Cancelado',
+};
+
 /** Mapeamento de cor por status de conversão */
 export const conversionStatusColor: Record<string, string> = {
   APPROVED: '#16a34a',
   PENDING:  '#d97706',
   CANCELED: '#9ca3af',
   REJECTED: '#dc2626',
+};
+
+/** Labels pt-BR para status de conversão */
+export const conversionStatusLabel: Record<string, string> = {
+  APPROVED: 'Aprovada',
+  PENDING:  'Pendente',
+  CANCELED: 'Cancelada',
+  REJECTED: 'Rejeitada',
+};
+
+/** Mapeamento de cor por status de pagamento */
+export const paymentStatusColor: Record<string, string> = {
+  PENDING: '#d97706',
+  PAID:    '#16a34a',
+  FAILED:  '#dc2626',
+};
+
+/** Labels pt-BR para status de pagamento */
+export const paymentStatusLabel: Record<string, string> = {
+  PENDING: 'Pendente',
+  PAID:    'Pago',
+  FAILED:  'Falhou',
 };
 
 /** Estilo padrão para botões de ação em tabelas */

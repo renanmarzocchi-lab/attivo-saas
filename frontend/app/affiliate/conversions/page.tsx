@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '../../../lib/api';
-import { fmt, fmtDate, conversionStatusColor, commissionStatusColor } from '../../../lib/formatting';
+import { fmt, fmtDate, conversionStatusColor, conversionStatusLabel, commissionStatusColor, commissionStatusLabel } from '../../../lib/formatting';
 
 interface Conversion {
   id: string; product?: string; grossAmount: number; commissionValue: number;
@@ -46,10 +46,10 @@ export default function AffiliateConversions() {
                 <td style={{ padding: '10px 12px', fontWeight: 700, color: '#16a34a' }}>{fmt(c.commissionValue)}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13 }}>{c.commission?.competenceMonth ?? '-'}</td>
                 <td style={{ padding: '10px 12px' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: conversionStatusColor[c.status] ?? '#374151' }}>{c.status}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: conversionStatusColor[c.status] ?? '#374151' }}>{conversionStatusLabel[c.status] ?? c.status}</span>
                 </td>
                 <td style={{ padding: '10px 12px' }}>
-                  <span style={{ fontSize: 12, color: commissionStatusColor[c.commission?.status ?? ''] ?? '#374151' }}>{c.commission?.status ?? '-'}</span>
+                  <span style={{ fontSize: 12, color: commissionStatusColor[c.commission?.status ?? ''] ?? '#374151' }}>{c.commission?.status ? (commissionStatusLabel[c.commission.status] ?? c.commission.status) : '-'}</span>
                 </td>
                 <td style={{ padding: '10px 12px', fontSize: 13 }}>{fmtDate(c.occurredAt)}</td>
               </tr>

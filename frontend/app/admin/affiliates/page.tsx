@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '../../../lib/api';
-import { affiliateStatusColor, btnStyle } from '../../../lib/formatting';
+import { affiliateStatusColor, affiliateStatusLabel, btnStyle } from '../../../lib/formatting';
 
 interface Affiliate {
   id: string; name: string; email: string; refCode: string; status: string;
@@ -59,7 +59,7 @@ export default function AdminAffiliates() {
         {['', 'PENDING', 'ACTIVE', 'REJECTED', 'BLOCKED'].map((s) => (
           <button key={s} onClick={() => { setStatus(s); setPage(1); }}
             style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #d1d5db', background: status === s ? '#1d4ed8' : '#fff', color: status === s ? '#fff' : '#374151', cursor: 'pointer' }}>
-            {s || 'Todos'}
+            {s ? (affiliateStatusLabel[s] ?? s) : 'Todos'}
           </button>
         ))}
       </div>
@@ -84,7 +84,7 @@ export default function AdminAffiliates() {
                 <td style={{ padding: '10px 12px', fontSize: 13, textAlign: 'center' }}>{a._count.leads}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13, textAlign: 'center' }}>{a._count.conversions}</td>
                 <td style={{ padding: '10px 12px' }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: affiliateStatusColor[a.status] ?? '#374151' }}>{a.status}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: affiliateStatusColor[a.status] ?? '#374151' }}>{affiliateStatusLabel[a.status] ?? a.status}</span>
                 </td>
                 <td style={{ padding: '10px 12px', display: 'flex', gap: 4 }}>
                   {a.status === 'PENDING' && <>

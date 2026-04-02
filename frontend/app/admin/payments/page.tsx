@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '../../../lib/api';
-import { fmt, fmtDate } from '../../../lib/formatting';
+import { fmt, fmtDate, paymentStatusColor, paymentStatusLabel } from '../../../lib/formatting';
 
 interface Payment {
   id: string; totalAmount: number; status: string; paidAt?: string; reference?: string;
@@ -45,7 +45,7 @@ export default function AdminPayments() {
                 <td style={{ padding: '10px 12px', fontSize: 12, color: '#6b7280' }}>{p.affiliate.pixKey ?? '-'}</td>
                 <td style={{ padding: '10px 12px', fontWeight: 700, color: '#16a34a' }}>{fmt(p.totalAmount)}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13, textAlign: 'center' }}>{p.items.length}</td>
-                <td style={{ padding: '10px 12px', fontSize: 12, fontWeight: 700 }}>{p.status}</td>
+                <td style={{ padding: '10px 12px', fontSize: 12, fontWeight: 700, color: paymentStatusColor[p.status] ?? '#374151' }}>{paymentStatusLabel[p.status] ?? p.status}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13 }}>{fmtDate(p.paidAt)}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13 }}>{p.reference ?? '-'}</td>
               </tr>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '../../../lib/api';
-import { fmt, commissionStatusColor } from '../../../lib/formatting';
+import { fmt, commissionStatusColor, commissionStatusLabel } from '../../../lib/formatting';
 
 interface Commission {
   id: string; amount: number; rate: number; status: string; competenceMonth: string;
@@ -37,7 +37,7 @@ export default function AdminCommissions() {
         {['', 'PENDING', 'AVAILABLE', 'PAID', 'CANCELED'].map(s => (
           <button key={s} onClick={() => { setStatus(s); setPage(1); }}
             style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #d1d5db', background: status === s ? '#1d4ed8' : '#fff', color: status === s ? '#fff' : '#374151', cursor: 'pointer' }}>
-            {s || 'Todas'}
+            {s ? (commissionStatusLabel[s] ?? s) : 'Todas'}
           </button>
         ))}
       </div>
@@ -58,7 +58,7 @@ export default function AdminCommissions() {
                 <td style={{ padding: '10px 12px', fontSize: 13 }}>{(Number(c.rate) * 100).toFixed(1)}%</td>
                 <td style={{ padding: '10px 12px', fontSize: 13 }}>{c.competenceMonth}</td>
                 <td style={{ padding: '10px 12px' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: commissionStatusColor[c.status] ?? '#374151' }}>{c.status}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: commissionStatusColor[c.status] ?? '#374151' }}>{commissionStatusLabel[c.status] ?? c.status}</span>
                 </td>
               </tr>
             ))}
