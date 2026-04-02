@@ -18,8 +18,9 @@ export function clearToken() {
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
+  const hasBody = options.body !== undefined && options.body !== null;
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers ?? {}),
   };
@@ -29,11 +30,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (res.status === 401) {
     clearToken();
     if (typeof window !== 'undefined') window.location.href = '/login';
-    throw new Error('Sessão expirada');
+    throw new Error('Sessão expirada. Faça login novamente.');
   }
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.message ?? `HTTP ${res.status}`);
+  if (!res.ok) {
+    const msg = data?.message ?? 'Ocorreu um erro inesperado. Tente novamente.';
+    throw new Error(msg);
+  }
   return data as T;
 }
 

@@ -36,24 +36,28 @@ export default function AdminAffiliates() {
     return () => { active = false; };
   }, [page, status]);
 
-  async function act(id: string, action: 'approve' | 'reject' | 'block') {
-    setMsg('');
+  const actionLabel: Record<string, string> = {
+    approve: 'Aprovar', reject: 'Rejeitar', block: 'Bloquear', unblock: 'Desbloquear',
+  };
+
+  async function act(id: string, action: 'approve' | 'reject' | 'block' | 'unblock') {
+    setMsg(''); setError('');
     try {
-      const r = await api.patch<{ message: string }>(`/affiliates/${id}/${action}`);
+      const r = await api.patch<{ message: string }>(`/affiliates/${id}/${action}`, {});
       setMsg(r.message);
-      load(page, status); // preserva contexto de filtro
+      load(page, status);
     } catch (e: unknown) {
-      setMsg(e instanceof Error ? e.message : 'Erro');
+      setError(e instanceof Error ? e.message : `Erro ao ${actionLabel[action]?.toLowerCase() ?? 'executar ação'}`);
     }
   }
 
-  if (error) return <p style={{ color: '#dc2626' }}>{error}</p>;
-  if (!res)  return <p>Carregando...</p>;
+  if (!res && !error) return <p>Carregando...</p>;
 
   return (
     <div>
       <h2 style={{ marginBottom: 16 }}>Afiliados</h2>
       {msg && <p style={{ background: '#f0fdf4', color: '#16a34a', padding: 10, borderRadius: 6, marginBottom: 12 }}>{msg}</p>}
+      {error && <p style={{ background: '#fef2f2', color: '#dc2626', padding: 10, borderRadius: 6, marginBottom: 12 }}>{error}</p>}
 
       <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
         {['', 'PENDING', 'ACTIVE', 'REJECTED', 'BLOCKED'].map((s) => (
@@ -93,6 +97,8 @@ export default function AdminAffiliates() {
                   </>}
                   {a.status === 'ACTIVE' &&
                     <button onClick={() => act(a.id, 'block')} style={btnStyle('#6b7280')}>Bloquear</button>}
+                  {(a.status === 'BLOCKED' || a.status === 'REJECTED') &&
+                    <button onClick={() => act(a.id, 'unblock')} style={btnStyle('#2563eb')}>Reativar</button>}
                 </td>
               </tr>
             ))}

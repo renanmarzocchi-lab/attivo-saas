@@ -133,6 +133,28 @@ export default async function affiliateRoutes(app) {
     return { message: 'Afiliado bloqueado' };
   });
 
+  // PATCH /affiliates/:id/unblock — somente MASTER_ADMIN
+  app.patch('/affiliates/:id/unblock', {
+    preHandler: [app.authenticate, app.authorize('MASTER_ADMIN')],
+  }, async (request, reply) => {
+    const { id } = request.params;
+    const affiliate = await prisma.affiliate.findUnique({ where: { id }, include: { user: true } });
+    if (!affiliate) return reply.code(404).send({ message: 'Afiliado não encontrado' });
+    if (affiliate.status !== 'BLOCKED' && affiliate.status !== 'REJECTED') {
+      return reply.code(422).send({ message: 'Apenas afiliados bloqueados ou rejeitados podem ser reativados' });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.affiliate.update({ where: { id }, data: { status: 'ACTIVE', approvedAt: new Date() } });
+      if (affiliate.user) {
+        await tx.user.update({ where: { id: affiliate.user.id }, data: { status: 'ACTIVE' } });
+      }
+    });
+
+    await audit(request.currentUser.id, 'AFFILIATE_UNBLOCKED', 'Affiliate', id, { unblockedBy: request.currentUser.email });
+    return { message: 'Afiliado reativado com sucesso' };
+  });
+
   // GET /affiliates — listagem com paginação (MASTER_ADMIN)
   app.get('/affiliates', {
     preHandler: [app.authenticate, app.authorize('MASTER_ADMIN')],
