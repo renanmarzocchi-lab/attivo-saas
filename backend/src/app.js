@@ -123,8 +123,16 @@ export function buildApp() {
     // Erros de validação Zod
     if (error.name === 'ZodError') {
       return reply.code(400).send({
-        message:   'Dados invalidos',
+        message:   'Dados inválidos. Verifique os campos e tente novamente.',
         errors:    error.errors,
+        requestId: reqId,
+      });
+    }
+
+    // Fastify: body vazio com Content-Type application/json
+    if (error.code === 'FST_ERR_CTP_EMPTY_JSON_BODY') {
+      return reply.code(400).send({
+        message:   'Requisição sem conteúdo.',
         requestId: reqId,
       });
     }
@@ -149,7 +157,7 @@ export function buildApp() {
     captureException(error, { requestId: reqId, userId, tenantId, url: request.url });
 
     return reply.code(500).send({
-      message:   isProd ? 'Erro interno do servidor' : error.message,
+      message:   isProd ? 'Ocorreu um erro interno. Tente novamente ou contate o suporte.' : error.message,
       requestId: reqId,
     });
   });

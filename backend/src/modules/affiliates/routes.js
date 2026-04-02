@@ -80,7 +80,7 @@ export default async function affiliateRoutes(app) {
     const { id } = request.params;
     const affiliate = await prisma.affiliate.findUnique({ where: { id }, include: { user: true } });
     if (!affiliate) return reply.code(404).send({ message: 'Afiliado não encontrado' });
-    if (affiliate.status !== 'PENDING') return reply.code(422).send({ message: 'Apenas afiliados PENDING podem ser aprovados' });
+    if (affiliate.status !== 'PENDING') return reply.code(422).send({ message: 'Apenas afiliados pendentes podem ser aprovados' });
 
     const doc = await prisma.documentVersion.findFirst({ where: { isCurrent: true, isRequired: true } });
     if (doc) {
