@@ -58,6 +58,7 @@ export default function AdminAffiliates() {
       <h2 style={{ marginBottom: 16 }}>Afiliados</h2>
       {msg && <p style={{ background: '#f0fdf4', color: '#16a34a', padding: 10, borderRadius: 6, marginBottom: 12 }}>{msg}</p>}
       {error && <p style={{ background: '#fef2f2', color: '#dc2626', padding: 10, borderRadius: 6, marginBottom: 12 }}>{error}</p>}
+      {!res && error && <p style={{ color: '#6b7280' }}>Não foi possível carregar os dados.</p>}
 
       <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
         {['', 'PENDING', 'ACTIVE', 'REJECTED', 'BLOCKED'].map((s) => (
@@ -68,7 +69,7 @@ export default function AdminAffiliates() {
         ))}
       </div>
 
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      {res && <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead style={{ background: '#f9fafb' }}>
             <tr>
@@ -104,13 +105,13 @@ export default function AdminAffiliates() {
             ))}
           </tbody>
         </table>
-      </div>
+      </div>}
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 16, alignItems: 'center' }}>
+      {res && <div style={{ display: 'flex', gap: 8, marginTop: 16, alignItems: 'center' }}>
         <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={btnStyle('#1d4ed8')}>Anterior</button>
         <span style={{ fontSize: 13 }}>Página {res.meta.page} de {res.meta.pages} ({res.meta.total} total)</span>
         <button disabled={page >= res.meta.pages} onClick={() => setPage(p => p + 1)} style={btnStyle('#1d4ed8')}>Próxima</button>
-      </div>
+      </div>}
     </div>
   );
 }
