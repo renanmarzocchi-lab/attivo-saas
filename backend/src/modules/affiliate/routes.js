@@ -3,18 +3,26 @@ import { prisma } from '../../lib/prisma.js';
 
 export default async function affiliateDashboardRoutes(app) {
 
-  // Helper: extrai affiliateId do currentUser
+  // Helper: extrai affiliateId do currentUser ou query (MASTER_ADMIN)
   async function getAffiliate(request, reply) {
     const user = request.currentUser;
-    if (!user.affiliateId) return reply.code(403).send({ message: 'Acesso negado' });
-    const affiliate = await prisma.affiliate.findUnique({ where: { id: user.affiliateId } });
+    // MASTER_ADMIN pode consultar qualquer afiliado via ?affiliateId=xxx
+    const affiliateId = user.role === 'MASTER_ADMIN'
+      ? (request.query?.affiliateId ?? null)
+      : user.affiliateId;
+    if (!affiliateId) {
+      return user.role === 'MASTER_ADMIN'
+        ? reply.code(400).send({ message: 'Informe o affiliateId como query parameter' })
+        : reply.code(403).send({ message: 'Acesso negado' });
+    }
+    const affiliate = await prisma.affiliate.findUnique({ where: { id: affiliateId } });
     if (!affiliate) return reply.code(404).send({ message: 'Afiliado não encontrado' });
     return affiliate;
   }
 
   // GET /affiliate/dashboard
   app.get('/affiliate/dashboard', {
-    preHandler: [app.authenticate, app.authorize('AFFILIATE')],
+    preHandler: [app.authenticate, app.authorize('AFFILIATE', 'MASTER_ADMIN')],
   }, async (request, reply) => {
     const affiliate = await getAffiliate(request, reply);
     if (!affiliate) return;
@@ -66,7 +74,7 @@ export default async function affiliateDashboardRoutes(app) {
 
   // GET /affiliate/conversions
   app.get('/affiliate/conversions', {
-    preHandler: [app.authenticate, app.authorize('AFFILIATE')],
+    preHandler: [app.authenticate, app.authorize('AFFILIATE', 'MASTER_ADMIN')],
   }, async (request, reply) => {
     const affiliate = await getAffiliate(request, reply);
     if (!affiliate) return;
@@ -106,7 +114,7 @@ export default async function affiliateDashboardRoutes(app) {
 
   // GET /affiliate/statement — extrato de comissões
   app.get('/affiliate/statement', {
-    preHandler: [app.authenticate, app.authorize('AFFILIATE')],
+    preHandler: [app.authenticate, app.authorize('AFFILIATE', 'MASTER_ADMIN')],
   }, async (request, reply) => {
     const affiliate = await getAffiliate(request, reply);
     if (!affiliate) return;
@@ -141,7 +149,7 @@ export default async function affiliateDashboardRoutes(app) {
 
   // GET /affiliate/payments — histórico de pagamentos
   app.get('/affiliate/payments', {
-    preHandler: [app.authenticate, app.authorize('AFFILIATE')],
+    preHandler: [app.authenticate, app.authorize('AFFILIATE', 'MASTER_ADMIN')],
   }, async (request, reply) => {
     const affiliate = await getAffiliate(request, reply);
     if (!affiliate) return;
