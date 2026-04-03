@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { prisma } from '../../lib/prisma.js';
+import { audit } from '../../lib/audit.js';
 
 export default async function affiliateDashboardRoutes(app) {
 
@@ -181,5 +182,72 @@ export default async function affiliateDashboardRoutes(app) {
     ]);
 
     return { data: payments, meta: { total, page, limit, pages: Math.ceil(total / limit) } };
+  });
+
+  // GET /affiliate/profile — dados do perfil do afiliado
+  app.get('/affiliate/profile', {
+    preHandler: [app.authenticate, app.authorize('AFFILIATE')],
+  }, async (request, reply) => {
+    const user = request.currentUser;
+    if (!user.affiliateId) return reply.code(403).send({ message: 'Acesso negado' });
+    const affiliate = await prisma.affiliate.findUnique({
+      where: { id: user.affiliateId },
+      select: {
+        id: true, name: true, document: true, email: true, phone: true,
+        cityUf: true, pixKey: true, address: true, addressNumber: true,
+        addressComplement: true, neighborhood: true, zipCode: true,
+        profileComplete: true, refCode: true, status: true,
+      },
+    });
+    if (!affiliate) return reply.code(404).send({ message: 'Afiliado não encontrado' });
+
+    // Verificar se aceitou documento vigente
+    const doc = await prisma.documentVersion.findFirst({ where: { isCurrent: true, isRequired: true } });
+    let documentAccepted = true;
+    if (doc) {
+      const acceptance = await prisma.affiliateDocumentAcceptance.findUnique({
+        where: { affiliateId_documentVersionId: { affiliateId: affiliate.id, documentVersionId: doc.id } },
+      });
+      documentAccepted = !!acceptance;
+    }
+
+    return { affiliate, documentAccepted };
+  });
+
+  // PATCH /affiliate/profile — atualizar perfil do afiliado
+  app.patch('/affiliate/profile', {
+    preHandler: [app.authenticate, app.authorize('AFFILIATE')],
+  }, async (request, reply) => {
+    const user = request.currentUser;
+    if (!user.affiliateId) return reply.code(403).send({ message: 'Acesso negado' });
+
+    const schema = z.object({
+      phone:             z.string().optional(),
+      cityUf:            z.string().optional(),
+      pixKey:            z.string().optional(),
+      address:           z.string().optional(),
+      addressNumber:     z.string().optional(),
+      addressComplement: z.string().optional(),
+      neighborhood:      z.string().optional(),
+      zipCode:           z.string().optional(),
+    });
+
+    const data = schema.parse(request.body);
+
+    // Calcular profileComplete
+    const current = await prisma.affiliate.findUnique({ where: { id: user.affiliateId } });
+    if (!current) return reply.code(404).send({ message: 'Afiliado não encontrado' });
+
+    const merged = { ...current, ...data };
+    const profileComplete = !!(merged.phone && merged.cityUf && merged.pixKey && merged.address && merged.zipCode);
+
+    const affiliate = await prisma.affiliate.update({
+      where: { id: user.affiliateId },
+      data: { ...data, profileComplete },
+    });
+
+    await audit(user.id, 'AFFILIATE_PROFILE_UPDATED', 'Affiliate', affiliate.id, { fields: Object.keys(data) });
+
+    return { message: 'Perfil atualizado com sucesso', affiliate: { id: affiliate.id, profileComplete: affiliate.profileComplete } };
   });
 }

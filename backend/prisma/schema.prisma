@@ -287,6 +287,12 @@ model Affiliate {
   phone          String?
   cityUf         String?
   pixKey         String?
+  address        String?
+  addressNumber  String?
+  addressComplement String?
+  neighborhood   String?
+  zipCode        String?
+  profileComplete Boolean        @default(false)
   refCode        String          @unique
   commissionRate Decimal         @default(0.1500) @db.Decimal(6, 4)
   status         AffiliateStatus @default(PENDING)

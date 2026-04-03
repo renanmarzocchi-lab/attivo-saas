@@ -16,6 +16,7 @@ export default function AffiliateLayout({ children }: { children: ReactNode }) {
             <a href="/affiliate/conversions" style={navStyle}>Conversões</a>
             <a href="/affiliate/statement"   style={navStyle}>Extrato</a>
             <a href="/affiliate/payments"    style={navStyle}>Pagamentos</a>
+            <a href="/affiliate/profile"     style={navStyle}>Meu Perfil</a>
           </nav>
           <hr style={{ marginTop: 16, marginBottom: 12, border: 'none', borderTop: '1px solid #e5e7eb' }} />
           <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: 14, fontWeight: 500, padding: '6px 0', textAlign: 'left' }}>
