@@ -5,11 +5,12 @@ import { api } from '../../lib/api';
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
-    name: '', document: '', email: '', phone: '', cityUf: '', pixKey: '', password: '', confirm: '',
+    name: '', document: '', email: '', phone: '', cityUf: '', password: '', confirm: '',
   });
   const [error, setError]     = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPw, setShowPw]   = useState(false);
 
   function set(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -28,11 +29,10 @@ export default function RegisterPage() {
         email:    form.email,
         phone:    form.phone   || undefined,
         cityUf:   form.cityUf  || undefined,
-        pixKey:   form.pixKey  || undefined,
         password: form.password,
       });
       setSuccess('Cadastro realizado! Aguarde a aprovação do administrador.');
-      setForm({ name: '', document: '', email: '', phone: '', cityUf: '', pixKey: '', password: '', confirm: '' });
+      setForm({ name: '', document: '', email: '', phone: '', cityUf: '', password: '', confirm: '' });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erro ao cadastrar');
     } finally {
@@ -41,6 +41,8 @@ export default function RegisterPage() {
   }
 
   const inp: React.CSSProperties = { padding: 10, borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, width: '100%' };
+  const pwWrap: React.CSSProperties = { position: 'relative' };
+  const eyeBtn: React.CSSProperties = { position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#6b7280', padding: 4 };
 
   return (
     <main className="container">
@@ -83,19 +85,19 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div>
-              <label style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 4 }}>Chave PIX</label>
-              <input style={inp} value={form.pixKey} onChange={e => set('pixKey', e.target.value)} placeholder="CPF, e-mail ou celular" />
-            </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
                 <label style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 4 }}>Senha *</label>
-                <input style={inp} type="password" value={form.password} onChange={e => set('password', e.target.value)} required placeholder="Mínimo 8 caracteres" />
+                <div style={pwWrap}>
+                  <input style={inp} type={showPw ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)} required placeholder="Mínimo 8 caracteres" />
+                  <button type="button" onClick={() => setShowPw(v => !v)} style={eyeBtn}>{showPw ? 'Ocultar' : 'Mostrar'}</button>
+                </div>
               </div>
               <div>
                 <label style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 4 }}>Confirmar senha *</label>
-                <input style={inp} type="password" value={form.confirm}  onChange={e => set('confirm', e.target.value)}  required placeholder="Repita a senha" />
+                <div style={pwWrap}>
+                  <input style={inp} type={showPw ? 'text' : 'password'} value={form.confirm}  onChange={e => set('confirm', e.target.value)}  required placeholder="Repita a senha" />
+                </div>
               </div>
             </div>
 

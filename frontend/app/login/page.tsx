@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [showPw, setShowPw]     = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -43,14 +44,20 @@ export default function LoginPage() {
             required
             style={{ padding: 12, borderRadius: 6, border: '1px solid #d1d5db' }}
           />
-          <input
-            type="password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ padding: 12, borderRadius: 6, border: '1px solid #d1d5db' }}
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showPw ? 'text' : 'password'}
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{ padding: 12, borderRadius: 6, border: '1px solid #d1d5db', width: '100%' }}
+            />
+            <button type="button" onClick={() => setShowPw(v => !v)}
+              style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>
+              {showPw ? 'Ocultar' : 'Mostrar'}
+            </button>
+          </div>
           {error && <p style={{ color: '#dc2626', fontSize: 14 }}>{error}</p>}
           <button
             type="submit"
