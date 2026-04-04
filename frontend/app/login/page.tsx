@@ -67,6 +67,9 @@ export default function LoginPage() {
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+            <a href="/forgot-password" style={{ color: '#1d4ed8' }}>Esqueci minha senha</a>
+          </p>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280' }}>
             Quer ser afiliado? <a href="/register" style={{ color: '#1d4ed8' }}>Cadastre-se</a>
           </p>
         </form>

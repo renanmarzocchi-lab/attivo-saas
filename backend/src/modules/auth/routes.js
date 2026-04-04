@@ -3,6 +3,7 @@ import { randomBytes, createHash } from 'crypto';
 import { z } from 'zod';
 import { prisma, normalizeEmail } from '../../lib/prisma.js';
 import { logger } from '../../lib/logger.js';
+import { sendEmail } from '../../integrations/email/service.js';
 
 const REFRESH_TOKEN_EXPIRES_DAYS = parseInt(process.env.REFRESH_TOKEN_DAYS ?? '30');
 const ACCESS_TOKEN_EXPIRES       = process.env.ACCESS_TOKEN_EXPIRES ?? '8h';
@@ -159,5 +160,92 @@ export default async function authRoutes(app) {
       orderBy: { createdAt: 'desc' },
     });
     return { sessions };
+  });
+
+  // POST /auth/forgot-password — solicita reset de senha
+  app.post('/auth/forgot-password', async (request, reply) => {
+    const schema = z.object({ email: z.string().email() });
+    const { email } = schema.parse(request.body);
+
+    const user = await prisma.user.findUnique({ where: { email: normalizeEmail(email) } });
+
+    // Sempre retorna sucesso (nao revelar se email existe)
+    if (!user) {
+      logger.info({ email }, 'Forgot password para email inexistente — ignorando');
+      return { message: 'Se o e-mail estiver cadastrado, você receberá as instruções de recuperação.' };
+    }
+
+    // Gerar token de reset (expira em 1h)
+    const resetToken = randomBytes(32).toString('hex');
+    const resetTokenHash = hashToken(resetToken);
+    const resetExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    // Salvar token como sessão especial (reutilizando a tabela session)
+    await prisma.session.create({
+      data: {
+        userId:           user.id,
+        refreshTokenHash: resetTokenHash,
+        userAgent:        'password-reset',
+        ipAddress:        request.ip,
+        expiresAt:        resetExpiresAt,
+      },
+    });
+
+    // Enviar email
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+
+    await sendEmail({
+      to:      user.email,
+      subject: 'ATTIVO — Recuperação de senha',
+      html:    `<p>Olá ${user.name},</p><p>Você solicitou a recuperação de senha. Clique no link abaixo para criar uma nova senha:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>Este link expira em 1 hora.</p><p>Se você não solicitou, ignore este e-mail.</p>`,
+      text:    `Olá ${user.name}, acesse ${resetUrl} para redefinir sua senha. Link válido por 1 hora.`,
+      templateKey: 'password-reset',
+    }).catch((err) => {
+      logger.error({ err, userId: user.id }, 'Falha ao enviar email de reset');
+    });
+
+    logger.info({ userId: user.id }, 'Token de reset gerado');
+    return { message: 'Se o e-mail estiver cadastrado, você receberá as instruções de recuperação.' };
+  });
+
+  // POST /auth/reset-password — reseta a senha com token
+  app.post('/auth/reset-password', async (request, reply) => {
+    const schema = z.object({
+      token:    z.string().min(10),
+      password: z.string().min(8),
+    });
+    const { token, password } = schema.parse(request.body);
+
+    const tokenHash = hashToken(token);
+    const session = await prisma.session.findFirst({
+      where: {
+        refreshTokenHash: tokenHash,
+        userAgent:        'password-reset',
+        status:           'ACTIVE',
+        expiresAt:        { gt: new Date() },
+      },
+      include: { user: true },
+    });
+
+    if (!session) {
+      return reply.code(400).send({ message: 'Link inválido ou expirado. Solicite novamente.' });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({ where: { id: session.userId }, data: { passwordHash } });
+      // Invalidar o token de reset
+      await tx.session.update({ where: { id: session.id }, data: { status: 'REVOKED', revokedAt: new Date() } });
+      // Revogar todas as sessoes ativas
+      await tx.session.updateMany({
+        where: { userId: session.userId, status: 'ACTIVE', id: { not: session.id } },
+        data:  { status: 'REVOKED', revokedAt: new Date() },
+      });
+    });
+
+    logger.info({ userId: session.userId }, 'Senha resetada com sucesso');
+    return { message: 'Senha alterada com sucesso! Faça login com a nova senha.' };
   });
 }
