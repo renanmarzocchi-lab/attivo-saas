@@ -127,7 +127,28 @@ export default async function authRoutes(app) {
   // GET /auth/me
   app.get('/auth/me', { preHandler: [app.authenticate] }, async (request) => {
     const user = request.currentUser;
-    return { user: { id: user.id, name: user.name, email: user.email, role: user.role, affiliateId: user.affiliateId ?? null } };
+    const result = { id: user.id, name: user.name, email: user.email, role: user.role, affiliateId: user.affiliateId ?? null };
+
+    // Para afiliados, incluir flags de pendencias
+    if (user.role === 'AFFILIATE' && user.affiliateId) {
+      const affiliate = await prisma.affiliate.findUnique({
+        where: { id: user.affiliateId },
+        select: { profileComplete: true, id: true },
+      });
+
+      let documentAccepted = true;
+      const doc = await prisma.documentVersion.findFirst({ where: { isCurrent: true, isRequired: true } });
+      if (doc && affiliate) {
+        const acceptance = await prisma.affiliateDocumentAcceptance.findUnique({
+          where: { affiliateId_documentVersionId: { affiliateId: affiliate.id, documentVersionId: doc.id } },
+        });
+        documentAccepted = !!acceptance;
+      }
+
+      return { user: { ...result, profileComplete: affiliate?.profileComplete ?? false, documentAccepted } };
+    }
+
+    return { user: result };
   });
 
   // GET /auth/sessions — lista sessões ativas do usuário

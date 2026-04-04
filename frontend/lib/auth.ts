@@ -6,6 +6,8 @@ export interface AuthUser {
   email: string;
   role: 'MASTER_ADMIN' | 'AFFILIATE' | 'BROKER';
   affiliateId?: string | null;
+  profileComplete?: boolean;
+  documentAccepted?: boolean;
 }
 
 export async function login(email: string, password: string): Promise<AuthUser> {
