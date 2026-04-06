@@ -43,8 +43,8 @@ export default function AdminAffiliates() {
   async function act(id: string, action: 'approve' | 'reject' | 'block' | 'unblock') {
     setMsg(''); setError('');
     try {
-      const r = await api.patch<{ message: string }>(`/affiliates/${id}/${action}`, {});
-      setMsg(r.message);
+      const r = await api.patch<{ message: string }>(`/affiliates/${id}/${action}`);
+      setMsg(r.message ?? `${actionLabel[action]} realizado com sucesso`);
       load(page, status);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : `Erro ao ${actionLabel[action]?.toLowerCase() ?? 'executar ação'}`);

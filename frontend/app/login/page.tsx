@@ -30,47 +30,56 @@ export default function LoginPage() {
     }
   }
 
+  const inp: React.CSSProperties = { padding: '12px 14px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 14, width: '100%', outline: 'none' };
+  const lbl: React.CSSProperties = { fontSize: 12, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 4 };
+
   return (
     <main className="container">
-      <div className="card" style={{ maxWidth: 420, margin: '64px auto' }}>
-        <h1 style={{ marginBottom: 4 }}>ATTIVO</h1>
-        <p style={{ color: '#6b7280', marginBottom: 24 }}>Programa de Afiliados</p>
-        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 12 }}>
-          <input
-            type="email"
-            placeholder="E-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ padding: 12, borderRadius: 6, border: '1px solid #d1d5db' }}
-          />
-          <div style={{ position: 'relative' }}>
+      <div className="card" style={{ maxWidth: 420, margin: '64px auto', padding: '32px 28px' }}>
+        <h1 style={{ marginBottom: 4, color: '#0f172a', fontSize: 28, fontWeight: 700 }}>ATTIVO</h1>
+        <p style={{ color: '#64748b', marginBottom: 24, fontSize: 15 }}>Programa de Afiliados</p>
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 14 }}>
+          <div>
+            <label style={lbl}>E-mail</label>
             <input
-              type={showPw ? 'text' : 'password'}
-              placeholder="Senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ padding: 12, borderRadius: 6, border: '1px solid #d1d5db', width: '100%' }}
+              style={inp}
             />
-            <button type="button" onClick={() => setShowPw(v => !v)}
-              style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>
-              {showPw ? 'Ocultar' : 'Mostrar'}
-            </button>
           </div>
-          {error && <p style={{ color: '#dc2626', fontSize: 14 }}>{error}</p>}
+          <div>
+            <label style={lbl}>Senha</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPw ? 'text' : 'password'}
+                placeholder="Sua senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={inp}
+              />
+              <button type="button" onClick={() => setShowPw(v => !v)}
+                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>
+                {showPw ? 'Ocultar' : 'Mostrar'}
+              </button>
+            </div>
+          </div>
+          {error && <p style={{ color: '#dc2626', fontSize: 13, background: '#fef2f2', padding: '10px 12px', borderRadius: 6, fontWeight: 500 }}>{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            style={{ padding: 12, background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}
+            style={{ padding: 12, background: '#1e3a5f', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 15, marginTop: 4 }}
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-            <a href="/forgot-password" style={{ color: '#1d4ed8' }}>Esqueci minha senha</a>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#64748b', marginTop: 4 }}>
+            <a href="/forgot-password" style={{ color: '#1d4ed8', fontWeight: 500 }}>Esqueci minha senha</a>
           </p>
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280' }}>
-            Quer ser afiliado? <a href="/register" style={{ color: '#1d4ed8' }}>Cadastre-se</a>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#64748b' }}>
+            Quer ser afiliado? <a href="/register" style={{ color: '#1d4ed8', fontWeight: 500 }}>Cadastre-se</a>
           </p>
         </form>
       </div>
