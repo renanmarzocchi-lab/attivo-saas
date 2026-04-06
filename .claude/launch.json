@@ -3,16 +3,14 @@
   "configurations": [
     {
       "name": "Backend (Fastify API)",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "cwd": "backend",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd /home/renan/attivo-saas/backend && npm run dev"],
       "port": 3333
     },
     {
       "name": "Frontend (Next.js)",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "cwd": "frontend",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd /home/renan/attivo-saas/frontend && npm run dev"],
       "port": 3000
     }
   ]

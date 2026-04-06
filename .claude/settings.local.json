@@ -46,7 +46,10 @@
       "Bash(curl -s http://localhost:3333/ready)",
       "Bash(curl -s http://localhost:3333/health)",
       "Bash(find C:UsersUsuarioDownloadsattivo-saas-repositorio-completo-reconstruido/backend/modules -type f -name *.js)",
-      "Bash(grep -l \"TODO\\\\|FIXME\\\\|XXX\\\\|HACK\" C:UsersUsuarioDownloadsattivo-saas-repositorio-completo-reconstruido/backend/src/**/*.js)"
+      "Bash(grep -l \"TODO\\\\|FIXME\\\\|XXX\\\\|HACK\" C:UsersUsuarioDownloadsattivo-saas-repositorio-completo-reconstruido/backend/src/**/*.js)",
+      "Read(///wsl$/Ubuntu/home/renan/attivo-saas/backend/**)",
+      "Bash(wslpath -w \"//wsl$/Ubuntu/home/renan/attivo-saas/frontend\")",
+      "Bash(echo \"//wsl$/Ubuntu/home/renan/attivo-saas/frontend\")"
     ]
   }
 }
