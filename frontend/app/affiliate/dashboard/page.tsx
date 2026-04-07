@@ -12,11 +12,32 @@ interface DashData {
   businessStats?: BusinessStats;
 }
 
-function Card({ label, value, highlight }: { label: string; value: string | number; highlight?: boolean }) {
+function StatCard({ label, value, highlight, icon }: { label: string; value: string | number; highlight?: boolean; icon?: string }) {
   return (
-    <div className="card" style={{ textAlign: 'center' }}>
-      <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 4 }}>{label}</p>
-      <p style={{ fontSize: 24, fontWeight: 700, color: highlight ? '#16a34a' : '#111827' }}>{value}</p>
+    <div style={{
+      background: '#fff',
+      borderRadius: 10,
+      padding: '18px 20px',
+      boxShadow: '0 2px 10px rgba(11,36,66,0.07)',
+      borderLeft: `4px solid ${highlight ? '#D1B46A' : '#e5e7eb'}`,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <p style={{ color: '#6b7280', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', margin: 0 }}>{label}</p>
+        {icon && <span style={{ fontSize: 18, opacity: 0.5 }}>{icon}</span>}
+      </div>
+      <p style={{ fontSize: 26, fontWeight: 800, color: highlight ? '#0B2442' : '#111827', margin: 0, lineHeight: 1 }}>{value}</p>
+    </div>
+  );
+}
+
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+      <div style={{ width: 4, height: 20, background: '#D1B46A', borderRadius: 2 }} />
+      <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#0B2442', textTransform: 'uppercase', letterSpacing: '0.7px' }}>{title}</h4>
     </div>
   );
 }
@@ -33,43 +54,61 @@ export default function AffiliateDashboard() {
     return () => { active = false; };
   }, []);
 
-  if (error) return <p style={{ color: '#dc2626' }}>{error}</p>;
-  if (!data)  return <p>Carregando...</p>;
+  if (error) return (
+    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 16, color: '#dc2626', fontSize: 14 }}>{error}</div>
+  );
+  if (!data) return (
+    <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>Carregando dashboard...</div>
+  );
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-        <h2>Meu Dashboard</h2>
-        <span style={{ background: '#dbeafe', color: '#1d4ed8', padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 600, fontFamily: 'monospace' }}>
-          {data.refCode}
-        </span>
-        <span style={{ background: '#f3f4f6', color: affiliateStatusColor[data.status] ?? '#16a34a', padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>
-          {affiliateStatusLabel[data.status] ?? data.status}
-        </span>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+        <div>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0B2442', margin: 0 }}>Meu Dashboard</h2>
+          <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Acompanhe sua performance como afiliado</p>
+        </div>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ background: '#f0f4f8', color: '#0B2442', padding: '4px 12px', borderRadius: 6, fontSize: 13, fontWeight: 700, fontFamily: 'monospace', border: '1px solid #dbe4f0' }}>
+            {data.refCode}
+          </span>
+          <span style={{
+            fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20, color: '#fff',
+            background: affiliateStatusColor[data.status] ?? '#6b7280',
+          }}>
+            {affiliateStatusLabel[data.status] ?? data.status}
+          </span>
+        </div>
       </div>
 
-      <div className="grid grid-4" style={{ marginBottom: 24 }}>
-        <Card label="Cliques"    value={data.totalClicks} />
-        <Card label="Leads"      value={data.totalLeads} />
-        <Card label="Conversões" value={data.totalConversions} />
+      <div style={{ marginBottom: 32 }}>
+        <SectionHeader title="Atividade" />
+        <div className="grid grid-4">
+          <StatCard label="Cliques"    value={data.totalClicks}      icon="🖱️" />
+          <StatCard label="Leads"      value={data.totalLeads}       icon="📋" />
+          <StatCard label="Conversões" value={data.totalConversions} icon="🎯" highlight />
+        </div>
       </div>
 
-      <h4 style={{ color: '#6b7280', marginBottom: 12 }}>Financeiro</h4>
-      <div className="grid grid-4" style={{ marginBottom: 24 }}>
-        <Card label="Disponível para Saque" value={fmt(data.availableCommission)} highlight />
-        <Card label="Total Recebido"        value={fmt(data.paidCommission)} />
+      <div style={{ marginBottom: 32 }}>
+        <SectionHeader title="Financeiro" />
+        <div className="grid grid-4">
+          <StatCard label="Disponível para Saque" value={fmt(data.availableCommission)} icon="💰" highlight />
+          <StatCard label="Total Recebido"        value={fmt(data.paidCommission)}      icon="✅" />
+        </div>
       </div>
 
       {data.businessStats && (
-        <>
-          <h4 style={{ color: '#6b7280', marginBottom: 12 }}>Negócios Originados</h4>
+        <div>
+          <SectionHeader title="Negócios Originados" />
           <div className="grid grid-4">
-            <Card label="Negócios Gerados"  value={data.businessStats.total} />
-            <Card label="Apólices Emitidas" value={data.businessStats.policies} />
-            <Card label="Taxa de Conversão" value={`${data.businessStats.conversionRate}%`} />
-            <Card label="Prêmio Total"      value={fmt(data.businessStats.premiumTotal)} highlight />
+            <StatCard label="Negócios Gerados"  value={data.businessStats.total}                      icon="🤝" />
+            <StatCard label="Apólices Emitidas" value={data.businessStats.policies}                  icon="📄" />
+            <StatCard label="Taxa de Conversão" value={`${data.businessStats.conversionRate}%`}       icon="📈" highlight />
+            <StatCard label="Prêmio Total"      value={fmt(data.businessStats.premiumTotal)}          icon="🏆" highlight />
           </div>
-        </>
+        </div>
       )}
     </div>
   );
