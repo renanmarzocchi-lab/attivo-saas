@@ -1,16 +1,43 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { api } from '../../lib/api';
+
+interface DeviceInfo {
+  userAgent: string;
+  language: string;
+  platform: string;
+  screenRes: string;
+  timezone: string;
+  timestamp: string;
+}
+
+function collectDeviceInfo(): DeviceInfo {
+  return {
+    userAgent: navigator.userAgent ?? '',
+    language: navigator.language ?? '',
+    platform: navigator.platform ?? '',
+    screenRes: `${screen.width}x${screen.height}`,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone ?? '',
+    timestamp: new Date().toISOString(),
+  };
+}
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
     name: '', document: '', email: '', phone: '', cityUf: '', password: '', confirm: '',
   });
-  const [error, setError]     = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showPw, setShowPw]   = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  const [error, setError]       = useState('');
+  const [success, setSuccess]   = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [showPw, setShowPw]     = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [device, setDevice]     = useState<DeviceInfo | null>(null);
+
+  useEffect(() => {
+    setDevice(collectDeviceInfo());
+  }, []);
 
   function set(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -26,6 +53,7 @@ export default function RegisterPage() {
     if (!form.phone.trim())      { setError('Informe seu celular'); return; }
     if (form.password.length < 8){ setError('Senha mínima de 8 caracteres'); return; }
     if (form.password !== form.confirm) { setError('As senhas não coincidem'); return; }
+    if (!accepted) { setError('Você precisa aceitar os Termos e Condições para continuar.'); return; }
 
     setLoading(true);
     try {
@@ -57,15 +85,12 @@ export default function RegisterPage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#0B2442', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 540, boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
+      <div style={{ background: '#fff', borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 580, boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
 
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <img src="/logo.png" alt="ATTIVO" style={{ height: 44, marginBottom: 12, objectFit: 'contain' }}
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <img src="/logo.png" alt="ATTIVO" style={{ height: 44, marginBottom: 8, objectFit: 'contain' }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-          <div style={{ fontSize: 24, fontWeight: 800, color: '#0B2442', letterSpacing: '-0.5px' }}>
-            ATTIVO<span style={{ color: '#D1B46A' }}>.</span>
-          </div>
           <p style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>Cadastro de Afiliado</p>
         </div>
 
@@ -137,14 +162,51 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {/* === TERMOS === */}
+            <div style={{ background: '#f8fafc', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showTerms ? 12 : 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#0B2442', margin: 0 }}>Termos e Condições do Programa de Afiliados</p>
+                <button type="button" onClick={() => setShowTerms(v => !v)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#D1B46A', fontWeight: 600 }}>
+                  {showTerms ? 'Ocultar' : 'Ler termos'}
+                </button>
+              </div>
+
+              {showTerms && (
+                <div style={{ maxHeight: 200, overflow: 'auto', background: '#fff', padding: 14, borderRadius: 8, fontSize: 12, lineHeight: 1.7, color: '#374151', border: '1px solid #e5e7eb', marginBottom: 12 }}>
+                  <p><strong>1. OBJETO</strong> — O presente termo regula a participação no Programa de Afiliados da plataforma ATTIVO, que permite ao AFILIADO indicar potenciais clientes para a contratação de seguros, recebendo comissão por conversões efetivadas.</p>
+                  <p><strong>2. CADASTRO</strong> — O candidato deverá fornecer dados pessoais verdadeiros. O cadastro ficará pendente de aprovação. A ATTIVO se reserva o direito de reprovar ou bloquear qualquer cadastro.</p>
+                  <p><strong>3. COMISSÕES</strong> — Calculadas sobre o valor da conversão efetivada. Pagamento via PIX, na chave informada. Comissões somente devidas após aprovação pela administração.</p>
+                  <p><strong>4. OBRIGAÇÕES</strong> — Manter dados atualizados. Não utilizar práticas enganosas ou spam. Não se apresentar como corretor sem habilitação legal.</p>
+                  <p><strong>5. PRIVACIDADE</strong> — Dados tratados conforme LGPD. IP, dados do navegador e dispositivo são coletados no momento do aceite para fins de auditoria e segurança.</p>
+                  <p><strong>6. DISPOSIÇÕES GERAIS</strong> — Termos podem ser alterados a qualquer momento. Descumprimento pode resultar em bloqueio imediato.</p>
+                </div>
+              )}
+
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', fontSize: 13, color: '#374151' }}>
+                <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)}
+                  style={{ marginTop: 2, width: 18, height: 18, accentColor: '#0B2442', flexShrink: 0 }} />
+                <span>
+                  Declaro que li e aceito os <strong>Termos e Condições</strong> do Programa de Afiliados ATTIVO e a <strong>Política de Privacidade</strong>.
+                  Autorizo a coleta de dados do dispositivo para fins de segurança e auditoria.
+                </span>
+              </label>
+
+              {device && (
+                <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 8, lineHeight: 1.5 }}>
+                  Dados coletados: {device.platform} · {device.screenRes} · {device.timezone} · {device.timestamp.slice(0, 19).replace('T', ' ')}
+                </p>
+              )}
+            </div>
+
             {error && (
               <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: 13, fontWeight: 500 }}>
                 {error}
               </div>
             )}
 
-            <button type="submit" disabled={loading}
-              style={{ padding: '14px 12px', background: loading ? '#4b6a8a' : '#0B2442', color: '#fff', border: 'none', borderRadius: 8, cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 15, marginTop: 4, letterSpacing: '0.3px' }}>
+            <button type="submit" disabled={loading || !accepted}
+              style={{ padding: '14px 12px', background: !accepted ? '#9ca3af' : loading ? '#4b6a8a' : '#0B2442', color: '#fff', border: 'none', borderRadius: 8, cursor: !accepted ? 'not-allowed' : loading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 15, letterSpacing: '0.3px' }}>
               {loading ? 'Cadastrando...' : 'Criar conta'}
             </button>
 

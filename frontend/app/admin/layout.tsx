@@ -8,29 +8,26 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <main className="container">
       <div style={{ display: 'flex', gap: 20 }}>
         <aside style={SIDEBAR}>
-          <div style={{ marginBottom: 20 }}>
-            <img src="/logo.png" alt="ATTIVO" style={{ height: 36, marginBottom: 10, objectFit: 'contain' }}
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <img src="/logo.png" alt="ATTIVO" style={{ height: 40, objectFit: 'contain', marginBottom: 8 }}
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-            <div style={{ fontSize: 20, fontWeight: 800, color: '#D1B46A', letterSpacing: '-0.3px', lineHeight: 1 }}>
-              ATTIVO<span style={{ color: 'rgba(255,255,255,0.4)' }}>.</span>
-            </div>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 3, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+            <p style={{ fontSize: 11, color: '#D1B46A', letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>
               Admin
             </p>
           </div>
 
           <div style={DIVIDER} />
 
-          <nav style={{ display: 'grid', gap: 2 }}>
-            <a href="/admin/dashboard"    style={NAV}>Dashboard</a>
-            <a href="/admin/affiliates"   style={NAV}>Afiliados</a>
-            <a href="/admin/conversions"  style={NAV}>Conversões</a>
-            <a href="/admin/commissions"  style={NAV}>Comissões</a>
-            <a href="/admin/payments"     style={NAV}>Pagamentos</a>
+          <nav style={{ display: 'grid', gap: 2, marginTop: 12 }}>
+            <a href="/admin/dashboard"    style={NAV}>📊 Dashboard</a>
+            <a href="/admin/affiliates"   style={NAV}>👥 Afiliados</a>
+            <a href="/admin/conversions"  style={NAV}>🎯 Conversões</a>
+            <a href="/admin/commissions"  style={NAV}>💰 Comissões</a>
+            <a href="/admin/payments"     style={NAV}>💳 Pagamentos</a>
             <div style={{ ...DIVIDER, margin: '8px 0' }} />
-            <a href="/admin/commercial"   style={NAV}>Comercial</a>
-            <a href="/admin/ranking"      style={NAV}>Ranking Corretores</a>
-            <a href="/admin/goals"        style={NAV}>Metas</a>
+            <a href="/admin/commercial"   style={NAV}>📈 Comercial</a>
+            <a href="/admin/ranking"      style={NAV}>🏆 Ranking</a>
+            <a href="/admin/goals"        style={NAV}>🎯 Metas</a>
             <a href="/admin/intelligence" style={NAV}>⚡ Inteligência IA</a>
           </nav>
 

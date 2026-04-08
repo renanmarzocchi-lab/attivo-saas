@@ -24,44 +24,63 @@ export default function AffiliateConversions() {
     return () => { active = false; };
   }, [page]);
 
-  if (error) return <p style={{ color: '#dc2626' }}>{error}</p>;
-  if (!res)  return <p>Carregando...</p>;
+  if (error) return <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 16, color: '#dc2626', fontSize: 14 }}>{error}</div>;
+  if (!res) return <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>Carregando conversões...</div>;
 
   return (
     <div>
-      <h2 style={{ marginBottom: 16 }}>Minhas Conversões</h2>
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ background: '#f9fafb' }}>
-            <tr>
-              {['Produto', 'Valor Bruto', 'Minha Comissão', 'Competência', 'Conv.', 'Comissão', 'Data'].map(h =>
-                <th key={h} style={{ padding: '10px 12px', textAlign: 'left', fontSize: 13, fontWeight: 600 }}>{h}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {res.data.map(c => (
-              <tr key={c.id} style={{ borderTop: '1px solid #f3f4f6' }}>
-                <td style={{ padding: '10px 12px', fontSize: 13 }}>{c.product ?? '-'}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13 }}>{fmt(c.grossAmount)}</td>
-                <td style={{ padding: '10px 12px', fontWeight: 700, color: '#16a34a' }}>{fmt(c.commissionValue)}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13 }}>{c.commission?.competenceMonth ?? '-'}</td>
-                <td style={{ padding: '10px 12px' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: conversionStatusColor[c.status] ?? '#374151' }}>{conversionStatusLabel[c.status] ?? c.status}</span>
-                </td>
-                <td style={{ padding: '10px 12px' }}>
-                  <span style={{ fontSize: 12, color: commissionStatusColor[c.commission?.status ?? ''] ?? '#374151' }}>{c.commission?.status ? (commissionStatusLabel[c.commission.status] ?? c.commission.status) : '-'}</span>
-                </td>
-                <td style={{ padding: '10px 12px', fontSize: 13 }}>{fmtDate(c.occurredAt)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0B2442', margin: 0 }}>Minhas Conversões</h2>
+        <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Acompanhe suas conversões e comissões geradas</p>
       </div>
+
+      {res.data.length === 0 ? (
+        <div className="card" style={{ textAlign: 'center', padding: 40, color: '#6b7280' }}>Nenhuma conversão registrada ainda.</div>
+      ) : (
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#0B2442' }}>
+                {['Produto', 'Valor Bruto', 'Minha Comissão', 'Competência', 'Conv.', 'Comissão', 'Data'].map(h =>
+                  <th key={h} style={TH}>{h}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {res.data.map((c, i) => (
+                <tr key={c.id} style={{ borderTop: '1px solid #f3f4f6', background: i % 2 === 0 ? '#fff' : '#fafbfc' }}>
+                  <td style={TD}>{c.product ?? '—'}</td>
+                  <td style={TD}>{fmt(c.grossAmount)}</td>
+                  <td style={{ ...TD, fontWeight: 700, color: '#16a34a' }}>{fmt(c.commissionValue)}</td>
+                  <td style={TD}>{c.commission?.competenceMonth ?? '—'}</td>
+                  <td style={TD}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', padding: '3px 10px', borderRadius: 20, background: conversionStatusColor[c.status] ?? '#6b7280' }}>
+                      {conversionStatusLabel[c.status] ?? c.status}
+                    </span>
+                  </td>
+                  <td style={TD}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: commissionStatusColor[c.commission?.status ?? ''] ?? '#6b7280' }}>
+                      {c.commission?.status ? (commissionStatusLabel[c.commission.status] ?? c.commission.status) : '—'}
+                    </span>
+                  </td>
+                  <td style={TD}>{fmtDate(c.occurredAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: 8, marginTop: 16, alignItems: 'center' }}>
-        <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #d1d5db', cursor: 'pointer' }}>Anterior</button>
-        <span style={{ fontSize: 13 }}>Página {res.meta.page} de {res.meta.pages}</span>
-        <button disabled={page >= res.meta.pages} onClick={() => setPage(p => p + 1)} style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #d1d5db', cursor: 'pointer' }}>Próxima</button>
+        <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
+          style={{ ...BTN, background: page === 1 ? '#e5e7eb' : '#0B2442', color: page === 1 ? '#9ca3af' : '#D1B46A', cursor: page === 1 ? 'default' : 'pointer' }}>← Anterior</button>
+        <span style={{ fontSize: 13, color: '#6b7280' }}>Página {res.meta.page} de {res.meta.pages}</span>
+        <button disabled={page >= res.meta.pages} onClick={() => setPage(p => p + 1)}
+          style={{ ...BTN, background: page >= res.meta.pages ? '#e5e7eb' : '#0B2442', color: page >= res.meta.pages ? '#9ca3af' : '#D1B46A', cursor: page >= res.meta.pages ? 'default' : 'pointer' }}>Próxima →</button>
       </div>
     </div>
   );
 }
+
+const TH: React.CSSProperties = { padding: '11px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.5px' };
+const TD: React.CSSProperties = { padding: '12px 14px', fontSize: 13 };
+const BTN: React.CSSProperties = { padding: '7px 16px', borderRadius: 6, border: 'none', fontWeight: 600, fontSize: 13 };
