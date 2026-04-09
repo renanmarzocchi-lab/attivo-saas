@@ -222,7 +222,7 @@
   });
 
   document.querySelectorAll('[data-whatsapp-affiliate]').forEach((el) => {
-    const base = 'https://wa.me/5519991154915';
+    const base = 'https://wa.me/5519994241018';
     const msg = el.getAttribute('data-whatsapp-message') || affiliateWhatsappMessage;
     el.setAttribute('href', `${base}?text=${encodeURIComponent(msg)}`);
   });

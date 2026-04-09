@@ -8,14 +8,11 @@ export default function BrokerLayout({ children }: { children: ReactNode }) {
     <main className="container">
       <div style={{ display: 'flex', gap: 20 }}>
         <aside style={SIDEBAR}>
-          <div style={{ marginBottom: 20 }}>
-            <img src="/logo.png" alt="ATTIVO" style={{ height: 36, marginBottom: 10, objectFit: 'contain' }}
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <img src="/logo.png" alt="ATTIVO Corretora de Seguros" style={{ height: 44, objectFit: 'contain', marginBottom: 10 }}
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-            <div style={{ fontSize: 20, fontWeight: 800, color: '#D1B46A', letterSpacing: '-0.3px', lineHeight: 1 }}>
-              ATTIVO<span style={{ color: 'rgba(255,255,255,0.4)' }}>.</span>
-            </div>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 3, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-              Área do Corretor
+            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 600, margin: 0 }}>
+              Corretor
             </p>
           </div>
 

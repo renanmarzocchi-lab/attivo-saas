@@ -6,18 +6,19 @@ import { affiliateStatusColor, affiliateStatusLabel } from '../../../lib/formatt
 
 interface Affiliate {
   id: string; name: string; email: string; refCode: string; status: string;
-  cityUf?: string; createdAt: string;
+  cityUf?: string; createdAt: string; commissionRate?: number;
   _count: { clicks: number; leads: number; conversions: number };
 }
 interface Res { data: Affiliate[]; meta: { total: number; page: number; pages: number } }
 
 export default function AdminAffiliates() {
-  const [res, setRes]                   = useState<Res | null>(null);
-  const [page, setPage]                 = useState(1);
-  const [status, setStatus]             = useState('');
-  const [error, setError]               = useState('');
-  const [msg, setMsg]                   = useState('');
+  const [res, setRes]                     = useState<Res | null>(null);
+  const [page, setPage]                   = useState(1);
+  const [status, setStatus]               = useState('');
+  const [error, setError]                 = useState('');
+  const [msg, setMsg]                     = useState('');
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const [editingRate, setEditingRate]      = useState<{ id: string; value: string } | null>(null);
 
   function load(p = page, s = status) {
     const params = new URLSearchParams({ page: String(p), limit: '20' });
@@ -51,6 +52,24 @@ export default function AdminAffiliates() {
       load(page, status);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : `Erro ao ${actionLabel[action]?.toLowerCase() ?? 'executar ação'}`);
+    } finally {
+      setLoadingAction(null);
+    }
+  }
+
+  async function saveRate(id: string) {
+    if (!editingRate) return;
+    const val = parseFloat(editingRate.value);
+    if (isNaN(val) || val < 0 || val > 100) { setError('Comissão deve ser entre 0% e 100%'); return; }
+    setMsg(''); setError('');
+    setLoadingAction(`${id}-rate`);
+    try {
+      await api.patch(`/affiliates/${id}/commission-rate`, { commissionRate: val / 100 });
+      setMsg('Taxa de comissão atualizada');
+      setEditingRate(null);
+      load(page, status);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Erro ao atualizar comissão');
     } finally {
       setLoadingAction(null);
     }
@@ -103,7 +122,7 @@ export default function AdminAffiliates() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#0B2442' }}>
-                {['Nome', 'E-mail', 'Ref', 'Cidade', 'Cliques', 'Leads', 'Conv.', 'Status', 'Ações'].map((h) => (
+                {['Nome', 'E-mail', 'Ref', 'Cidade', 'Comissão', 'Cliques', 'Leads', 'Conv.', 'Status', 'Ações'].map((h) => (
                   <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     {h}
                   </th>
@@ -113,10 +132,45 @@ export default function AdminAffiliates() {
             <tbody>
               {res.data.map((a, i) => (
                 <tr key={a.id} style={{ borderTop: '1px solid #f3f4f6', background: i % 2 === 0 ? '#fff' : '#fafbfc' }}>
-                  <td style={{ padding: '12px 14px', fontSize: 14, fontWeight: 500, color: '#111827' }}>{a.name}</td>
+                  <td style={{ padding: '12px 14px', fontSize: 14, fontWeight: 500, color: '#111827' }}>
+                    <a href={`/admin/affiliates/${a.id}`} style={{ color: '#0B2442', textDecoration: 'none', borderBottom: '1px dashed #D1B46A' }}>
+                      {a.name}
+                    </a>
+                  </td>
                   <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{a.email}</td>
                   <td style={{ padding: '12px 14px', fontFamily: 'monospace', fontSize: 12, color: '#0B2442', fontWeight: 600, background: '#f0f4f8', borderRadius: 4 }}>{a.refCode}</td>
                   <td style={{ padding: '12px 14px', fontSize: 13, color: '#374151' }}>{a.cityUf ?? '—'}</td>
+                  <td style={{ padding: '12px 14px', fontSize: 13, textAlign: 'center' }}>
+                    {editingRate?.id === a.id ? (
+                      <div style={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'center' }}>
+                        <input
+                          type="number" step="0.1" min="0" max="100"
+                          value={editingRate.value}
+                          onChange={(e) => setEditingRate({ id: a.id, value: e.target.value })}
+                          onKeyDown={(e) => { if (e.key === 'Enter') saveRate(a.id); if (e.key === 'Escape') setEditingRate(null); }}
+                          autoFocus
+                          style={{ width: 56, padding: '3px 6px', fontSize: 12, borderRadius: 4, border: '1.5px solid #D1B46A', textAlign: 'center', outline: 'none' }}
+                        />
+                        <span style={{ fontSize: 11, color: '#6b7280' }}>%</span>
+                        <button onClick={() => saveRate(a.id)} disabled={loadingAction === `${a.id}-rate`}
+                          style={{ padding: '2px 6px', fontSize: 10, borderRadius: 3, border: 'none', background: '#16a34a', color: '#fff', cursor: 'pointer', fontWeight: 700 }}>
+                          {loadingAction === `${a.id}-rate` ? '...' : '✓'}
+                        </button>
+                        <button onClick={() => setEditingRate(null)}
+                          style={{ padding: '2px 6px', fontSize: 10, borderRadius: 3, border: 'none', background: '#9ca3af', color: '#fff', cursor: 'pointer', fontWeight: 700 }}>
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <span
+                        onClick={() => setEditingRate({ id: a.id, value: a.commissionRate ? (Number(a.commissionRate) * 100).toFixed(1) : '15.0' })}
+                        style={{ fontWeight: 700, color: '#D1B46A', cursor: 'pointer', borderBottom: '1px dashed #D1B46A' }}
+                        title="Clique para editar"
+                      >
+                        {a.commissionRate ? `${(Number(a.commissionRate) * 100).toFixed(1)}%` : '—'}
+                      </span>
+                    )}
+                  </td>
                   <td style={{ padding: '12px 14px', fontSize: 13, textAlign: 'center', fontWeight: 600 }}>{a._count.clicks}</td>
                   <td style={{ padding: '12px 14px', fontSize: 13, textAlign: 'center', fontWeight: 600 }}>{a._count.leads}</td>
                   <td style={{ padding: '12px 14px', fontSize: 13, textAlign: 'center', fontWeight: 600 }}>{a._count.conversions}</td>

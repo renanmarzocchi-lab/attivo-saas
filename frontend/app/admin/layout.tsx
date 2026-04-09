@@ -9,9 +9,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div style={{ display: 'flex', gap: 20 }}>
         <aside style={SIDEBAR}>
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
-            <img src="/logo.png" alt="ATTIVO" style={{ height: 40, objectFit: 'contain', marginBottom: 8 }}
+            <img src="/logo.png" alt="ATTIVO Corretora de Seguros" style={{ height: 44, objectFit: 'contain', marginBottom: 10 }}
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-            <p style={{ fontSize: 11, color: '#D1B46A', letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>
+            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 600, margin: 0 }}>
               Admin
             </p>
           </div>
@@ -29,6 +29,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <a href="/admin/ranking"      style={NAV}>🏆 Ranking</a>
             <a href="/admin/goals"        style={NAV}>🎯 Metas</a>
             <a href="/admin/intelligence" style={NAV}>⚡ Inteligência IA</a>
+            <div style={{ ...DIVIDER, margin: '8px 0' }} />
+            <a href="/admin/users"        style={NAV}>👤 Usuários</a>
+            <a href="/admin/integrations" style={NAV}>⚙️ Integrações</a>
           </nav>
 
           <div style={{ ...DIVIDER, margin: '16px 0 12px' }} />

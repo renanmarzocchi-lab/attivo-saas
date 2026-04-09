@@ -68,6 +68,34 @@ export const paymentStatusLabel: Record<string, string> = {
   FAILED:  'Falhou',
 };
 
+/** Mapeamento de cor por status de usuário */
+export const userStatusColor: Record<string, string> = {
+  ACTIVE: '#16a34a',
+  INACTIVE: '#d97706',
+  BLOCKED: '#6b7280',
+};
+
+/** Labels pt-BR para status de usuário */
+export const userStatusLabel: Record<string, string> = {
+  ACTIVE: 'Ativo',
+  INACTIVE: 'Inativo',
+  BLOCKED: 'Bloqueado',
+};
+
+/** Labels pt-BR para role de usuário */
+export const userRoleLabel: Record<string, string> = {
+  MASTER_ADMIN: 'Admin',
+  BROKER: 'Corretor',
+  AFFILIATE: 'Afiliado',
+};
+
+/** Mapeamento de cor por role */
+export const userRoleColor: Record<string, string> = {
+  MASTER_ADMIN: '#0B2442',
+  BROKER: '#2563eb',
+  AFFILIATE: '#D1B46A',
+};
+
 /** Estilo padrão para botões de ação em tabelas */
 export function btnStyle(bg: string): React.CSSProperties {
   return {

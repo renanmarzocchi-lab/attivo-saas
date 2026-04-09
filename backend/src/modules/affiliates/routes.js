@@ -203,4 +203,27 @@ export default async function affiliateRoutes(app) {
     if (!affiliate) return reply.code(404).send({ message: 'Afiliado não encontrado' });
     return { affiliate };
   });
+
+  // PATCH /affiliates/:id/commission-rate — somente MASTER_ADMIN
+  app.patch('/affiliates/:id/commission-rate', {
+    preHandler: [app.authenticate, app.authorize('MASTER_ADMIN')],
+  }, async (request, reply) => {
+    const { id } = request.params;
+    const schema = z.object({
+      commissionRate: z.number().min(0).max(1),
+    });
+    const { commissionRate } = schema.parse(request.body);
+
+    const affiliate = await prisma.affiliate.findUnique({ where: { id } });
+    if (!affiliate) return reply.code(404).send({ message: 'Afiliado não encontrado' });
+
+    const oldRate = Number(affiliate.commissionRate);
+    await prisma.affiliate.update({ where: { id }, data: { commissionRate } });
+
+    await audit(request.currentUser.id, 'AFFILIATE_COMMISSION_RATE_UPDATED', 'Affiliate', id, {
+      oldRate, newRate: commissionRate, updatedBy: request.currentUser.email,
+    });
+
+    return { message: 'Taxa de comissão atualizada', affiliate: { id, commissionRate } };
+  });
 }

@@ -29,6 +29,7 @@ import automationsRoutes        from './modules/admin/automations.routes.js';
 import rankingRoutes            from './modules/admin/ranking.routes.js';
 import commercialDashboardRoutes from './modules/admin/commercial-dashboard.routes.js';
 import intelligenceRoutes       from './modules/intelligence/routes.js';
+import userRoutes               from './modules/admin/users.routes.js';
 
 const isProd = env.NODE_ENV === 'production';
 
@@ -112,6 +113,7 @@ export function buildApp() {
     v1.register(rankingRoutes,           { prefix: '' });
     v1.register(commercialDashboardRoutes, { prefix: '' });
     v1.register(intelligenceRoutes,      { prefix: '' });
+    v1.register(userRoutes,              { prefix: '' });
   }, { prefix: '/api/v1' });
 
   // ── Error handler global ───────────────────────────────────────────────────

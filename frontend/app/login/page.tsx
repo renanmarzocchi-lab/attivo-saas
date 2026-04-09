@@ -36,12 +36,8 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <img src="/logo.png" alt="ATTIVO" style={{ height: 48, marginBottom: 12, objectFit: 'contain' }}
+          <img src="/logo.png" alt="ATTIVO Corretora de Seguros" style={{ height: 56, objectFit: 'contain' }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-          <div style={{ fontSize: 26, fontWeight: 800, color: '#0B2442', letterSpacing: '-0.5px', lineHeight: 1 }}>
-            ATTIVO<span style={{ color: '#D1B46A' }}>.</span>
-          </div>
-          <p style={{ color: '#6b7280', fontSize: 13, marginTop: 6 }}>Corretora de Seguros</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 18 }}>

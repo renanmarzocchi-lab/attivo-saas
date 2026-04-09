@@ -89,9 +89,9 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <img src="/logo.png" alt="ATTIVO" style={{ height: 44, marginBottom: 8, objectFit: 'contain' }}
+          <img src="/logo.png" alt="ATTIVO Corretora de Seguros" style={{ height: 56, objectFit: 'contain' }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-          <p style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>Cadastro de Afiliado</p>
+          <p style={{ color: '#6b7280', fontSize: 13, marginTop: 10 }}>Cadastro de Afiliado</p>
         </div>
 
         {success ? (
