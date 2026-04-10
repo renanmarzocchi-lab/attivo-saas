@@ -34,9 +34,19 @@ export default function RegisterPage() {
   const [showPw, setShowPw]     = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [device, setDevice]     = useState<DeviceInfo | null>(null);
+  const [referredBy, setReferredBy] = useState<string>('');
 
   useEffect(() => {
     setDevice(collectDeviceInfo());
+    // Captura ?ref= da URL ou do localStorage (setado pelo site institucional)
+    const params = new URLSearchParams(window.location.search);
+    const urlRef = (params.get('ref') || '').trim();
+    const storedRef = (localStorage.getItem('attivo_affiliate_ref') || '').trim();
+    const ref = urlRef || storedRef;
+    if (ref) {
+      setReferredBy(ref);
+      localStorage.setItem('attivo_affiliate_ref', ref);
+    }
   }, []);
 
   function set(field: string, value: string) {
@@ -64,6 +74,7 @@ export default function RegisterPage() {
         phone:    form.phone.trim(),
         cityUf:   form.cityUf.trim() || undefined,
         password: form.password,
+        referredByCode: referredBy || undefined,
       });
       setSuccess('Cadastro realizado! Aguarde a aprovação do administrador.');
       setForm({ name: '', document: '', email: '', phone: '', cityUf: '', password: '', confirm: '' });
@@ -93,6 +104,12 @@ export default function RegisterPage() {
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
           <p style={{ color: '#6b7280', fontSize: 13, marginTop: 10 }}>Cadastro de Afiliado</p>
         </div>
+
+        {referredBy && !success && (
+          <div style={{ background: '#fef9e7', border: '1.5px solid #D1B46A', borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#0B2442', textAlign: 'center' }}>
+            Você está se cadastrando por indicação do parceiro <strong>#{referredBy}</strong>
+          </div>
+        )}
 
         {success ? (
           <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '20px 18px', color: '#15803d', textAlign: 'center' }}>

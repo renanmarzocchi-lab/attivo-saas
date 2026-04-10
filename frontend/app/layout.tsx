@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata = {
-  title: 'ATTIVO SaaS',
+  title: 'Attivo Afiliados',
   description: 'Painel ATTIVO Corretora de Seguros',
   icons: {
     icon: '/favicon.ico',

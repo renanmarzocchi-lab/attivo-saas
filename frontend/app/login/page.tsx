@@ -102,6 +102,15 @@ export default function LoginPage() {
             </a>
           </div>
         </form>
+
+        <div style={{ borderTop: '1px solid #f3f4f6', marginTop: 24, paddingTop: 16, textAlign: 'center' }}>
+          <a
+            href="https://attivocorretora.com.br/afiliados/admin/"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#9ca3af', textDecoration: 'none', fontWeight: 500 }}
+          >
+            <span style={{ fontSize: 14 }}>🔐</span> Acesso Master Admin
+          </a>
+        </div>
       </div>
     </main>
   );

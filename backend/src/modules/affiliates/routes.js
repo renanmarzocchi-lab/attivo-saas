@@ -16,6 +16,7 @@ export default async function affiliateRoutes(app) {
       cityUf:   z.string().optional(),
       pixKey:   z.string().optional(),
       password: z.string().min(8),
+      referredByCode: z.string().optional(),
     });
 
     const data = schema.parse(request.body);
@@ -41,6 +42,18 @@ export default async function affiliateRoutes(app) {
       });
       return aff;
     });
+
+    // Registra indicação no audit log (se veio de um link com ?ref=)
+    if (data.referredByCode) {
+      const referrer = await prisma.affiliate.findUnique({ where: { refCode: data.referredByCode } });
+      if (referrer) {
+        await audit(null, 'AFFILIATE_REGISTERED_FROM_REFERRAL', 'Affiliate', affiliate.id, {
+          referredByAffiliateId: referrer.id,
+          referredByRefCode: referrer.refCode,
+          referredByName: referrer.name,
+        });
+      }
+    }
 
     return reply.code(201).send({ affiliate: { id: affiliate.id, name: affiliate.name, email: affiliate.email, refCode: affiliate.refCode, status: affiliate.status } });
   });

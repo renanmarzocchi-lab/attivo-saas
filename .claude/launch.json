@@ -10,7 +10,7 @@
     {
       "name": "Frontend (Next.js)",
       "runtimeExecutable": "bash",
-      "runtimeArgs": ["-c", "cd /home/renan/attivo-saas/frontend && npm run dev"],
+      "runtimeArgs": ["-c", "cd /home/renan/attivo-saas/frontend && node node_modules/next/dist/bin/next dev"],
       "port": 3000
     }
   ]
