@@ -25,7 +25,15 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...(options.headers ?? {}),
   };
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  } catch (e) {
+    if (e instanceof TypeError) {
+      throw new Error('Não foi possível conectar ao servidor. Verifique sua conexão ou contate o suporte.');
+    }
+    throw e;
+  }
 
   if (res.status === 401) {
     clearToken();

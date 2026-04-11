@@ -4,7 +4,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('attivo_token')?.value;
   const { pathname } = request.nextUrl;
 
-  const isPublic = pathname === '/login' || pathname === '/register' || pathname === '/' || pathname === '/forgot-password' || pathname === '/reset-password';
+  const isPublic = pathname === '/login' || pathname === '/login/master' || pathname === '/register' || pathname === '/' || pathname === '/forgot-password' || pathname === '/reset-password';
   if (isPublic) return NextResponse.next();
 
   if (!token) {

@@ -31,84 +31,89 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#0B2442', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '44px 40px', width: '100%', maxWidth: 420, boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
+    <main style={{ minHeight: '100vh', background: '#f0f4f8', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ width: '100%', maxWidth: 420 }}>
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <img src="/logo.png" alt="ATTIVO Corretora de Seguros" style={{ height: 56, objectFit: 'contain' }}
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-        </div>
+        {/* Card */}
+        <div style={{ background: '#fff', borderRadius: 16, padding: '44px 40px', boxShadow: '0 8px 40px rgba(11,36,66,0.12)', border: '1px solid #e5e7eb' }}>
 
-        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 18 }}>
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              E-mail
-            </label>
-            <input
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ padding: '12px 14px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 14, width: '100%', outline: 'none', transition: 'border-color 0.15s' }}
-              onFocus={(e) => (e.currentTarget.style.borderColor = '#0B2442')}
-              onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
-            />
+          {/* Logo + título */}
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <img src="/logo.png" alt="ATTIVO Corretora de Seguros" style={{ height: 52, objectFit: 'contain' }}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+            <p style={{ color: '#9ca3af', fontSize: 12, marginTop: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
+              Portal do Afiliado
+            </p>
           </div>
 
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Senha
-            </label>
-            <div style={{ position: 'relative' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 18 }}>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                E-mail
+              </label>
               <input
-                type={showPw ? 'text' : 'password'}
-                placeholder="Sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                style={{ padding: '12px 14px', paddingRight: 80, borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 14, width: '100%', outline: 'none', transition: 'border-color 0.15s' }}
+                style={{ padding: '13px 14px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 14, width: '100%', outline: 'none', transition: 'border-color 0.15s', color: '#111827' }}
                 onFocus={(e) => (e.currentTarget.style.borderColor = '#0B2442')}
                 onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
               />
-              <button type="button" onClick={() => setShowPw(v => !v)}
-                style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#6b7280', fontWeight: 500 }}>
-                {showPw ? 'Ocultar' : 'Mostrar'}
-              </button>
             </div>
-          </div>
 
-          {error && (
-            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: 13, fontWeight: 500 }}>
-              {error}
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                Senha
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  placeholder="Sua senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  style={{ padding: '13px 14px', paddingRight: 80, borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 14, width: '100%', outline: 'none', transition: 'border-color 0.15s', color: '#111827' }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0B2442')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                />
+                <button type="button" onClick={() => setShowPw(v => !v)}
+                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#6b7280', fontWeight: 500 }}>
+                  {showPw ? 'Ocultar' : 'Mostrar'}
+                </button>
+              </div>
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{ padding: '14px 12px', background: loading ? '#4b6a8a' : '#0B2442', color: '#fff', border: 'none', borderRadius: 8, cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 15, marginTop: 4, letterSpacing: '0.3px', transition: 'background 0.15s' }}
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
+            {error && (
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: 13, fontWeight: 500 }}>
+                {error}
+              </div>
+            )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f3f4f6', paddingTop: 16, marginTop: 4 }}>
-            <a href="/forgot-password" style={{ color: '#6b7280', fontSize: 13, textDecoration: 'none', fontWeight: 500 }}>
-              Esqueci minha senha
-            </a>
-            <a href="/register" style={{ color: '#D1B46A', fontSize: 13, textDecoration: 'none', fontWeight: 600 }}>
-              Seja afiliado →
-            </a>
-          </div>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{ padding: '14px 12px', background: loading ? '#4b6a8a' : '#0B2442', color: '#fff', border: 'none', borderRadius: 8, cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 15, marginTop: 4, letterSpacing: '0.3px', transition: 'background 0.15s' }}
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
 
-        <div style={{ borderTop: '1px solid #f3f4f6', marginTop: 24, paddingTop: 16, textAlign: 'center' }}>
-          <a
-            href="https://attivocorretora.com.br/afiliados/admin/"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#9ca3af', textDecoration: 'none', fontWeight: 500 }}
-          >
-            <span style={{ fontSize: 14 }}>🔐</span> Acesso Master Admin
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f3f4f6', paddingTop: 16, marginTop: 4 }}>
+              <a href="/forgot-password" style={{ color: '#6b7280', fontSize: 13, textDecoration: 'none', fontWeight: 500 }}>
+                Esqueci minha senha
+              </a>
+              <a href="/register" style={{ color: '#D1B46A', fontSize: 13, textDecoration: 'none', fontWeight: 600 }}>
+                Seja afiliado →
+              </a>
+            </div>
+          </form>
+        </div>
+
+        {/* Link admin discreto fora do card */}
+        <div style={{ textAlign: 'center', marginTop: 16 }}>
+          <a href="/login/master" style={{ color: '#9ca3af', fontSize: 11, textDecoration: 'none', fontWeight: 500 }}>
+            🔐 Acesso administrativo
           </a>
         </div>
       </div>
