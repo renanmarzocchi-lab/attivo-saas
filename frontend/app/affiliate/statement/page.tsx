@@ -47,6 +47,20 @@ export default function AffiliateStatement() {
         ))}
       </div>
 
+      {res.data.length > 0 && (
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+          {[
+            { label: 'Total da página', value: res.data.reduce((s, c) => s + Number(c.amount), 0), color: '#0B2442' },
+            { label: 'Disponível', value: res.data.filter(c => c.status === 'AVAILABLE').reduce((s, c) => s + Number(c.amount), 0), color: '#2563eb' },
+            { label: 'Já pago', value: res.data.filter(c => c.status === 'PAID').reduce((s, c) => s + Number(c.amount), 0), color: '#16a34a' },
+          ].map(item => (
+            <div key={item.label} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 18px', minWidth: 140 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 6px' }}>{item.label}</p>
+              <p style={{ fontSize: 18, fontWeight: 800, color: item.color, margin: 0 }}>{fmt(item.value)}</p>
+            </div>
+          ))}
+        </div>
+      )}
       {res.data.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: 40, color: '#6b7280' }}>Nenhuma comissão encontrada.</div>
       ) : (

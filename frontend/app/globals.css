@@ -210,3 +210,39 @@ html, body {
 @media (max-width: 600px) {
   .kpi-grid { grid-template-columns: 1fr; gap: 12px; }
 }
+
+/* ── Login split layout ──────────────────────────────────────────────── */
+.login-brand-panel {
+  flex: 0 0 420px;
+  background: linear-gradient(160deg, #051525 0%, #0B2442 60%, #0d3060 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 48px 40px;
+  position: relative;
+  overflow: hidden;
+  gap: 32px;
+}
+@media (max-width: 768px) {
+  .login-brand-panel {
+    display: none;
+  }
+}
+
+/* ── Input focus ring ────────────────────────────────────────────────── */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
+
+/* ── Smooth page transitions ─────────────────────────────────────────── */
+.admin-content, .admin-shell section {
+  animation: pageIn 0.2s ease;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Card hover lift ─────────────────────────────────────────────────── */
+.card {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
