@@ -53,6 +53,7 @@ export default function AffiliateLayout({ children }: { children: ReactNode }) {
             <a href="/affiliate/statement"   style={NAV}>📋 Extrato</a>
             <a href="/affiliate/payments"    style={NAV}>💳 Pagamentos</a>
             <a href="/affiliate/profile"     style={NAV}>👤 Meu Perfil</a>
+            <a href="/affiliate/security"    style={NAV}>🔒 Segurança</a>
           </nav>
 
           {hasPending && (

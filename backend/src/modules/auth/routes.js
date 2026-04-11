@@ -162,6 +162,50 @@ export default async function authRoutes(app) {
     return { sessions };
   });
 
+  // PATCH /auth/change-password — troca de senha autenticada
+  app.patch('/auth/change-password', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const schema = z.object({
+      currentPassword: z.string().min(1, 'Informe a senha atual'),
+      newPassword:     z.string().min(8, 'Nova senha deve ter no mínimo 8 caracteres'),
+    });
+    const { currentPassword, newPassword } = schema.parse(request.body);
+
+    const user = await prisma.user.findUnique({ where: { id: request.currentUser.id } });
+    if (!user) return reply.code(404).send({ message: 'Usuário não encontrado' });
+
+    const ok = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!ok) return reply.code(400).send({ message: 'Senha atual incorreta' });
+
+    if (currentPassword === newPassword) {
+      return reply.code(400).send({ message: 'A nova senha deve ser diferente da atual' });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({ where: { id: user.id }, data: { passwordHash } });
+      // Revoga todas as sessões ativas para forçar novo login em outros dispositivos
+      await tx.session.updateMany({
+        where: { userId: user.id, status: 'ACTIVE' },
+        data:  { status: 'REVOKED', revokedAt: new Date() },
+      });
+    });
+
+    logger.info({ userId: user.id }, 'Senha alterada pelo usuário');
+    return { message: 'Senha alterada com sucesso.' };
+  });
+
+  // DELETE /auth/sessions/:id — revoga uma sessão específica
+  app.delete('/auth/sessions/:id', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const session = await prisma.session.findFirst({
+      where: { id, userId: request.currentUser.id, status: 'ACTIVE' },
+    });
+    if (!session) return reply.code(404).send({ message: 'Sessão não encontrada' });
+    await prisma.session.update({ where: { id }, data: { status: 'REVOKED', revokedAt: new Date() } });
+    return { message: 'Sessão encerrada' };
+  });
+
   // POST /auth/forgot-password — solicita reset de senha
   app.post('/auth/forgot-password', async (request, reply) => {
     const schema = z.object({ email: z.string().email() });

@@ -24,6 +24,7 @@ export default function BrokerLayout({ children }: { children: ReactNode }) {
             <a href="/broker/leads"        style={NAV}>Leads</a>
             <a href="/broker/tasks"        style={NAV}>Tarefas</a>
             <a href="/broker/intelligence" style={NAV}>🎯 Inteligência</a>
+            <a href="/broker/security"     style={NAV}>🔒 Segurança</a>
           </nav>
 
           <div style={{ marginTop: 16 }}>

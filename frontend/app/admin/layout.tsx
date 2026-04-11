@@ -32,6 +32,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div style={{ ...DIVIDER, margin: '8px 0' }} />
             <a href="/admin/users"        style={NAV}>👤 Usuários</a>
             <a href="/admin/integrations" style={NAV}>⚙️ Integrações</a>
+            <a href="/admin/security"     style={NAV}>🔒 Segurança</a>
           </nav>
 
           <div style={{ ...DIVIDER, margin: '16px 0 12px' }} />
