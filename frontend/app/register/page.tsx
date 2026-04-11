@@ -25,7 +25,7 @@ function collectDeviceInfo(): DeviceInfo {
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
-    name: '', document: '', email: '', phone: '', cityUf: '', password: '', confirm: '',
+    name: '', document: '', email: '', phone: '', cityUf: '', pixKey: '', password: '', confirm: '',
   });
   const [accepted, setAccepted] = useState(false);
   const [error, setError]       = useState('');
@@ -73,11 +73,12 @@ export default function RegisterPage() {
         email:    form.email.trim(),
         phone:    form.phone.trim(),
         cityUf:   form.cityUf.trim() || undefined,
+        pixKey:   form.pixKey.trim() || undefined,
         password: form.password,
         referredByCode: referredBy || undefined,
       });
       setSuccess('Cadastro realizado! Aguarde a aprovação do administrador.');
-      setForm({ name: '', document: '', email: '', phone: '', cityUf: '', password: '', confirm: '' });
+      setForm({ name: '', document: '', email: '', phone: '', cityUf: '', pixKey: '', password: '', confirm: '' });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erro ao cadastrar');
     } finally {
@@ -156,6 +157,17 @@ export default function RegisterPage() {
                   onFocus={e => (e.currentTarget.style.borderColor = '#0B2442')}
                   onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')} />
               </div>
+            </div>
+
+            <div style={{ background: '#fef9e7', border: '1.5px solid #D1B46A', borderRadius: 10, padding: '14px 16px' }}>
+              <label style={{ ...lbl, color: '#92400e' }}>Chave PIX — para receber suas comissões</label>
+              <input style={{ ...inp, borderColor: '#D1B46A' }} value={form.pixKey} onChange={e => set('pixKey', e.target.value)}
+                placeholder="CPF, e-mail, celular ou chave aleatória"
+                onFocus={e => (e.currentTarget.style.borderColor = '#0B2442')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#D1B46A')} />
+              <p style={{ fontSize: 11, color: '#92400e', margin: '6px 0 0', opacity: 0.8 }}>
+                Opcional agora — pode ser preenchida depois no seu perfil. Necessária para receber pagamentos.
+              </p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>

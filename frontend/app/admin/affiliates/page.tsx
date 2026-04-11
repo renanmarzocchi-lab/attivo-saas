@@ -85,9 +85,18 @@ export default function AdminAffiliates() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0B2442', margin: 0 }}>Afiliados</h2>
-        <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Gerencie e aprove os afiliados da plataforma</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+        <div style={{ flex: 1 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0B2442', margin: 0 }}>Afiliados</h2>
+          <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Gerencie e aprove os afiliados da plataforma</p>
+        </div>
+        {res && res.data.filter(a => a.status === 'PENDING').length > 0 && status !== 'PENDING' && (
+          <button onClick={() => { setStatus('PENDING'); setPage(1); }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef3c7', border: '2px solid #f59e0b', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 700, fontSize: 13, color: '#92400e', transition: 'all 0.15s' }}>
+            <span style={{ fontSize: 18 }}>⚠</span>
+            {res.data.filter(a => a.status === 'PENDING').length} aguardando aprovação → ver
+          </button>
+        )}
       </div>
 
       {msg && (

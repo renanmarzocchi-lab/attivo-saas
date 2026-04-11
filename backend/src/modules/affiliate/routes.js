@@ -28,10 +28,14 @@ export default async function affiliateDashboardRoutes(app) {
     const affiliate = await getAffiliate(request, reply);
     if (!affiliate) return;
 
+    const now = new Date();
+    const competenceMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
     const [
       totalLeads, totalClicks, totalConversions,
       availableCommission, paidCommission,
       businessTotal, businessPolicies, businessPremium,
+      monthlyResult, allEarnings,
     ] = await Promise.all([
       prisma.affiliateLead.count({ where: { affiliateId: affiliate.id } }),
       prisma.affiliateClick.count({ where: { affiliateId: affiliate.id } }),
@@ -54,7 +58,23 @@ export default async function affiliateDashboardRoutes(app) {
         _sum: { premiumAmount: true },
         where: { affiliateId: affiliate.id, sourceType: 'AFFILIATE' },
       }),
+      prisma.affiliateCommission.aggregate({
+        _sum: { amount: true },
+        where: { affiliateId: affiliate.id, status: { in: ['AVAILABLE', 'PAID'] }, competenceMonth },
+      }),
+      prisma.affiliateCommission.groupBy({
+        by: ['affiliateId'],
+        _sum: { amount: true },
+        where: { status: { in: ['AVAILABLE', 'PAID'] } },
+        orderBy: { _sum: { amount: 'desc' } },
+      }),
     ]);
+
+    const availableAmt = Number(availableCommission._sum.amount ?? 0);
+    const paidAmt      = Number(paidCommission._sum.amount ?? 0);
+    const totalEarnings = availableAmt + paidAmt;
+    const rankIndex = allEarnings.findIndex((a) => a.affiliateId === affiliate.id);
+    const ranking   = rankIndex >= 0 ? rankIndex + 1 : allEarnings.length + 1;
 
     return {
       refCode:              affiliate.refCode,
@@ -62,8 +82,11 @@ export default async function affiliateDashboardRoutes(app) {
       totalLeads,
       totalClicks,
       totalConversions,
-      availableCommission:  Number(availableCommission._sum.amount ?? 0),
-      paidCommission:       Number(paidCommission._sum.amount ?? 0),
+      availableCommission:  availableAmt,
+      paidCommission:       paidAmt,
+      totalEarnings,
+      monthlyEarnings:      Number(monthlyResult._sum.amount ?? 0),
+      ranking,
       businessStats: {
         total:          businessTotal,
         policies:       businessPolicies,
