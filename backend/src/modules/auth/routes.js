@@ -197,7 +197,7 @@ export default async function authRoutes(app) {
 
   // DELETE /auth/sessions/:id — revoga uma sessão específica
   app.delete('/auth/sessions/:id', { preHandler: [app.authenticate] }, async (request, reply) => {
-    const { id } = request.params as { id: string };
+    const { id } = request.params;
     const session = await prisma.session.findFirst({
       where: { id, userId: request.currentUser.id, status: 'ACTIVE' },
     });
