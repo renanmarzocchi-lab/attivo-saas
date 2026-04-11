@@ -165,7 +165,7 @@ export default function AdminConversions() {
       {res && res.data.length === 0 && !showForm ? (
         <div className="card" style={{ textAlign: 'center', padding: 40, color: '#6b7280' }}>Nenhuma conversão registrada ainda.</div>
       ) : res && res.data.length > 0 && (
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="card table-wrap" style={{ padding: 0 }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#0B2442' }}>

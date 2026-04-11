@@ -96,7 +96,7 @@ export default function RegisterPage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#0B2442', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 580, boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
+      <div className="register-card" style={{ background: '#fff', borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 580, boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>

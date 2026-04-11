@@ -182,7 +182,7 @@ export default function AdminUsers() {
       </div>
 
       {res && (
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="card table-wrap" style={{ padding: 0 }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#0B2442' }}>

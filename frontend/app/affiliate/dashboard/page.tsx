@@ -92,11 +92,10 @@ export default function AffiliateDashboard() {
       </div>
 
       {/* ── HERO FINANCEIRO ────────────────────────────────────── */}
-      <div style={{
+      <div className="hero-fin" style={{
         background: 'linear-gradient(135deg, #0B2442 0%, #0d2d52 100%)',
         borderRadius: 14, padding: '28px 32px', marginBottom: 16,
         boxShadow: '0 8px 32px rgba(11,36,66,0.18)',
-        display: 'grid', gridTemplateColumns: '1fr auto', gap: 24, alignItems: 'center',
       }}>
         <div>
           <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 8px' }}>
@@ -125,7 +124,7 @@ export default function AffiliateDashboard() {
       </div>
 
       {/* ── MINI CARDS ─────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 28 }}>
+      <div className="stats-grid" style={{ marginBottom: 28 }}>
         <MiniCard
           label="Ganhos do mês"
           value={fmt(data.monthlyEarnings)}
@@ -150,7 +149,7 @@ export default function AffiliateDashboard() {
             #{data.refCode}
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
+        <div className="ref-link-row">
           <div style={{ flex: 1, background: '#f8fafc', border: '1.5px solid #e5e7eb', borderRadius: 8, padding: '11px 14px', fontSize: 13, color: '#374151', fontFamily: 'monospace', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center' }}>
             {refUrl}
           </div>
@@ -172,7 +171,7 @@ export default function AffiliateDashboard() {
       {/* ── GRÁFICOS ───────────────────────────────────────────── */}
       <div style={{ marginBottom: 28 }}>
         <SectionHeader title="Desempenho" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="charts-grid">
           <div className="card">
             <p style={{ fontSize: 12, fontWeight: 700, color: '#0B2442', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Funil de Indicações
