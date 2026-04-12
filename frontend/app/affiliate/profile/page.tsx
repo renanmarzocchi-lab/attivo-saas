@@ -134,7 +134,7 @@ export default function AffiliateProfile() {
               </div>
               <div>
                 <label style={lbl}>Cidade / UF *</label>
-                <input style={inp} value={form.cityUf} onChange={e => set('cityUf', e.target.value)} placeholder="São Paulo / SP"
+                <input style={inp} value={form.cityUf} onChange={e => set('cityUf', e.target.value)} placeholder="Ex: Americana / SP"
                   onFocus={e => (e.currentTarget.style.borderColor = '#0B2442')}
                   onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')} />
               </div>

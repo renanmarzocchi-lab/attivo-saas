@@ -246,3 +246,96 @@ input:focus, select:focus, textarea:focus {
 .card {
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
+
+/* ── Scrollbar personalizada (webkit) ───────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(11,36,66,0.18); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(11,36,66,0.32); }
+
+/* ── Table striped hover ─────────────────────────────────────────────── */
+tbody tr:hover {
+  background: rgba(11,36,66,0.025) !important;
+  transition: background 0.1s;
+}
+
+/* ── Badge pill ──────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Botões com gradiente navy ───────────────────────────────────────── */
+.btn-navy {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #0B2442 0%, #0d2d52 100%);
+  color: #D1B46A;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(11,36,66,0.18);
+}
+.btn-navy:hover {
+  box-shadow: 0 6px 18px rgba(11,36,66,0.28);
+  transform: translateY(-1px);
+}
+.btn-navy:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Affiliate payments empty state ─────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+}
+.empty-state-icon {
+  font-size: 44px;
+  margin-bottom: 16px;
+}
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0B2442;
+  margin: 0 0 8px;
+}
+.empty-state-desc {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 auto;
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+/* ── Sidebar nav item hover ──────────────────────────────────────────── */
+.admin-sidebar nav a:hover {
+  background: rgba(255,255,255,0.06) !important;
+  color: rgba(255,255,255,0.9) !important;
+}
+
+/* ── Form field focus ring melhora ──────────────────────────────────── */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(11,36,66,0.08);
+}
+
+/* ── Pagination melhorada ────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  align-items: center;
+}
+.pagination-info {
+  font-size: 13px;
+  color: #6b7280;
+}

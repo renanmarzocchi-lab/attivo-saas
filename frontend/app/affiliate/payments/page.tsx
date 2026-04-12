@@ -33,11 +33,29 @@ export default function AffiliatePayments() {
         <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Histórico de pagamentos recebidos</p>
       </div>
 
+      {res.data.length > 0 && (
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+          {[
+            { label: 'Total recebido', value: res.data.reduce((s, p) => s + Number(p.totalAmount), 0), color: '#16a34a' },
+            { label: 'Pagamentos na página', value: res.data.length, isCnt: true, color: '#0B2442' },
+          ].map(item => (
+            <div key={item.label} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 18px', minWidth: 140 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 6px' }}>{item.label}</p>
+              <p style={{ fontSize: 18, fontWeight: 800, color: item.color, margin: 0 }}>
+                {item.isCnt ? item.value : fmt(item.value as number)}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {res.data.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: 40, color: '#6b7280' }}>
-          <p style={{ fontSize: 40, marginBottom: 12 }}>💳</p>
-          <p style={{ fontWeight: 600, fontSize: 16, color: '#374151', marginBottom: 4 }}>Nenhum pagamento ainda</p>
-          <p style={{ fontSize: 14 }}>Quando suas comissões forem pagas, aparecerão aqui.</p>
+        <div className="card">
+          <div className="empty-state">
+            <div className="empty-state-icon">💳</div>
+            <p className="empty-state-title">Nenhum pagamento ainda</p>
+            <p className="empty-state-desc">Quando suas comissões forem pagas, elas aparecerão aqui com todos os detalhes.</p>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'grid', gap: 16 }}>
