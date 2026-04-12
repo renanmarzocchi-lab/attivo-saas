@@ -204,14 +204,39 @@ export default function LoginPage() {
               </a>
             </div>
           </form>
-        </div>
-      </div>
 
-      {/* Link admin fixo */}
-      <div style={{ position: 'fixed', bottom: 16, right: 20 }}>
-        <a href="/login/master" style={{ color: 'rgba(0,0,0,0.25)', fontSize: 11, textDecoration: 'none', fontWeight: 500 }}>
-          🔐 Admin
-        </a>
+          {/* Acesso Administrativo — visível e claro */}
+          <div style={{
+            marginTop: 24,
+            padding: '14px 18px',
+            background: 'linear-gradient(135deg, #060f1d 0%, #0B2442 100%)',
+            borderRadius: 12,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 20 }}>🔐</span>
+              <div>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#D1B46A' }}>Área Administrativa</p>
+                <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Acesso master e corretor</p>
+              </div>
+            </div>
+            <a href="/login/master" style={{
+              padding: '8px 14px',
+              background: '#D1B46A',
+              color: '#0B2442',
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 800,
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}>
+              Entrar →
+            </a>
+          </div>
+        </div>
       </div>
     </main>
   );
