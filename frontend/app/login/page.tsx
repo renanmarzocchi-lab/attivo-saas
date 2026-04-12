@@ -108,6 +108,12 @@ export default function LoginPage() {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
         <div style={{ width: '100%', maxWidth: 400 }}>
 
+          {/* Logo visível apenas no mobile (painel esquerdo escondido) */}
+          <div className="login-mobile-logo">
+            <img src="/logo.png" alt="ATTIVO Corretora de Seguros" style={{ height: 44, objectFit: 'contain' }}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+          </div>
+
           <div style={{ marginBottom: 36 }}>
             <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0B2442', margin: '0 0 8px' }}>
               Entrar na conta

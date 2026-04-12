@@ -339,3 +339,102 @@ input:focus, select:focus, textarea:focus {
   font-size: 13px;
   color: #6b7280;
 }
+
+/* ── 2-col form grid (collapses em mobile) ───────────────────────────── */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 540px) {
+  .form-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ── Business stats 4-col (afiliado dashboard) ───────────────────────── */
+.biz-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 900px) {
+  .biz-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Mobile touch targets e espaçamento geral ────────────────────────── */
+@media (max-width: 480px) {
+  /* Aumentar padding do container no mobile */
+  .container { padding: 12px; }
+
+  /* Admin content sem animação excessiva no mobile */
+  .admin-content { padding-top: 64px; }
+
+  /* Stats grid: forçar 2 colunas mesmo em tela muito pequena */
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+
+  /* Charts em mobile: 1 coluna */
+  .charts-grid { grid-template-columns: 1fr; }
+
+  /* Card padding reduzido no mobile */
+  .card { padding: 14px; }
+
+  /* KPI grid: 1 coluna em mobile */
+  .kpi-grid { grid-template-columns: 1fr; gap: 10px; }
+
+  /* Business stats: 2 colunas no mobile */
+  .biz-stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* Ref link row: stack vertical */
+  .ref-link-row { flex-direction: column; }
+
+  /* Botões de ação menores no mobile */
+  .btn-navy { padding: 10px 14px; font-size: 12px; }
+
+  /* Table header menor */
+  table th, table td { font-size: 12px; padding: 8px 10px; }
+}
+
+/* ── Login — mobile sem painel esquerdo ──────────────────────────────── */
+@media (max-width: 768px) {
+  /* Centralizar logo no form quando o painel esquerdo some */
+  .login-mobile-logo {
+    display: flex !important;
+  }
+}
+.login-mobile-logo {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 28px;
+  gap: 8px;
+}
+
+/* ── Register: form em tela muito pequena ────────────────────────────── */
+@media (max-width: 400px) {
+  .register-card {
+    padding: 20px 14px !important;
+  }
+}
+
+/* ── Hamburger toggle melhorado ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar-toggle {
+    top: 12px;
+    left: 12px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
+/* ── Affiliate/broker shell: scroll suave ────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Touch targets mínimos ───────────────────────────────────────────── */
+button, a, [role="button"] {
+  min-height: 40px;
+}
+nav a { min-height: 36px; }

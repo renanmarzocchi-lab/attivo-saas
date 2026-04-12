@@ -225,7 +225,7 @@ export default function AffiliateDashboard() {
       {data.businessStats && (
         <div>
           <SectionHeader title="Negócios Originados" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+          <div className="biz-stats-grid">
             <MiniCard label="Negócios Gerados" value={String(data.businessStats.total)} />
             <MiniCard label="Apólices Emitidas" value={String(data.businessStats.policies)} />
             <MiniCard label="Taxa de Conversão" value={`${data.businessStats.conversionRate}%`} />

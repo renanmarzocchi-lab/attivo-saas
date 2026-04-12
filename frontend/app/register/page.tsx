@@ -121,7 +121,7 @@ export default function RegisterPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="form-grid-2">
               <div>
                 <label style={lbl}>Nome completo *</label>
                 <input style={inp} value={form.name} onChange={e => set('name', e.target.value)} required placeholder="João Silva"
@@ -143,7 +143,7 @@ export default function RegisterPage() {
                 onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')} />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="form-grid-2">
               <div>
                 <label style={lbl}>Celular *</label>
                 <input style={inp} value={form.phone} onChange={e => set('phone', e.target.value)} required placeholder="(00) 90000-0000"
@@ -158,7 +158,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="form-grid-2">
               <div>
                 <label style={lbl}>Senha *</label>
                 <div style={{ position: 'relative' }}>
