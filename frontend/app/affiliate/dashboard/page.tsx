@@ -27,7 +27,7 @@ function MiniCard({ label, value, sub }: { label: string; value: string; sub?: s
   return (
     <div style={{ background: '#fff', borderRadius: 10, padding: '16px 18px', boxShadow: '0 2px 8px rgba(11,36,66,0.07)' }}>
       <p style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 8px' }}>{label}</p>
-      <p style={{ fontSize: 22, fontWeight: 800, color: '#0B2442', margin: 0, lineHeight: 1 }}>{value}</p>
+      <p className="mini-val">{value}</p>
       {sub && <p style={{ fontSize: 11, color: '#9ca3af', margin: '4px 0 0' }}>{sub}</p>}
     </div>
   );
@@ -83,7 +83,7 @@ export default function AffiliateDashboard() {
       {/* ── Header ─────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ flex: 1 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0B2442', margin: 0 }}>Meu Dashboard</h2>
+          <h2 className="page-h2">Meu Dashboard</h2>
           <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Acompanhe seus ganhos e indicações em tempo real</p>
         </div>
         <span style={{ fontSize: 11, fontWeight: 700, padding: '5px 14px', borderRadius: 20, color: '#fff', background: affiliateStatusColor[data.status] ?? '#6b7280' }}>
@@ -101,25 +101,21 @@ export default function AffiliateDashboard() {
           <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 8px' }}>
             💰 Disponível para saque
           </p>
-          <p style={{ color: '#D1B46A', fontSize: 44, fontWeight: 900, margin: '0 0 6px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-            {fmt(data.availableCommission)}
-          </p>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, margin: 0 }}>
-            Acumulado total:&nbsp;
-            <strong style={{ color: 'rgba(255,255,255,0.8)' }}>{fmt(data.totalEarnings)}</strong>
-            &nbsp;&nbsp;·&nbsp;&nbsp;
-            Já recebido:&nbsp;
-            <strong style={{ color: '#86efac' }}>{fmt(data.paidCommission)}</strong>
+          <p className="hero-amount">{fmt(data.availableCommission)}</p>
+          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, margin: 0, flexWrap: 'wrap', display: 'flex', gap: 4 }}>
+            <span>Acumulado: <strong style={{ color: 'rgba(255,255,255,0.8)' }}>{fmt(data.totalEarnings)}</strong></span>
+            <span style={{ opacity: 0.4 }}>·</span>
+            <span>Já recebido: <strong style={{ color: '#86efac' }}>{fmt(data.paidCommission)}</strong></span>
           </p>
         </div>
-        <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: '16px 22px', minWidth: 130 }}>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 6px' }}>
-            🏆 Ranking
-          </p>
-          <p style={{ color: '#D1B46A', fontSize: 36, fontWeight: 900, margin: 0, lineHeight: 1 }}>
-            #{data.ranking}
-          </p>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, margin: '5px 0 0' }}>entre afiliados</p>
+        <div className="ranking-box">
+          <div>
+            <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 6px' }}>
+              🏆 Ranking
+            </p>
+            <p className="rank-num">#{data.ranking}</p>
+            <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, margin: '5px 0 0' }}>entre afiliados</p>
+          </div>
         </div>
       </div>
 
@@ -132,15 +128,15 @@ export default function AffiliateDashboard() {
         />
         <MiniCard label="Cliques" value={String(data.totalClicks)} sub="no seu link" />
         <MiniCard label="Leads gerados" value={String(data.totalLeads)} sub="contatos capturados" />
-        <MiniCard label="Taxa de conversão" value={`${convRate}%`} sub={`${data.totalConversions} conversões aprovadas`} />
+        <MiniCard label="Conversão" value={`${convRate}%`} sub={`${data.totalConversions} aprovadas`} />
       </div>
 
       {/* ── LINK DE INDICAÇÃO ──────────────────────────────────── */}
       <div style={{
-        background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 28,
+        background: '#fff', borderRadius: 12, padding: '20px 20px', marginBottom: 28,
         boxShadow: '0 2px 10px rgba(11,36,66,0.07)', border: '1.5px solid #e5e7eb',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 18 }}>🔗</span>
           <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#0B2442', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
             Seu link de indicação
@@ -150,11 +146,11 @@ export default function AffiliateDashboard() {
           </span>
         </div>
         <div className="ref-link-row">
-          <div style={{ flex: 1, background: '#f8fafc', border: '1.5px solid #e5e7eb', borderRadius: 8, padding: '11px 14px', fontSize: 13, color: '#374151', fontFamily: 'monospace', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center' }}>
+          <div style={{ flex: 1, background: '#f8fafc', border: '1.5px solid #e5e7eb', borderRadius: 8, padding: '11px 14px', fontSize: 13, color: '#374151', fontFamily: 'monospace', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
             {refUrl}
           </div>
           <button onClick={copyLink}
-            style={{ padding: '0 22px', borderRadius: 8, border: 'none', background: copied ? '#16a34a' : '#0B2442', color: copied ? '#fff' : '#D1B46A', fontWeight: 700, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s', minWidth: 130 }}>
+            style={{ padding: '0 20px', borderRadius: 8, border: 'none', background: copied ? '#16a34a' : '#0B2442', color: copied ? '#fff' : '#D1B46A', fontWeight: 700, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s' }}>
             {copied ? '✓ Copiado!' : '📋 Copiar link'}
           </button>
           <a href={`https://wa.me/?text=${encodeURIComponent(`Olá! Conheça os seguros da ATTIVO: ${refUrl}`)}`}
@@ -178,10 +174,10 @@ export default function AffiliateDashboard() {
             </p>
             {funnelData.some(d => d.value > 0) ? (
               <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={funnelData} barSize={44}>
-                  <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                  <Tooltip formatter={(v) => [String(v), 'Total']} contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 13 }} />
+                <BarChart data={funnelData} barSize={36}>
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} width={30} />
+                  <Tooltip formatter={(v) => [String(v), 'Total']} contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }} />
                   <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                     {funnelData.map((_, i) => <Cell key={i} fill={funnelColors[i]} />)}
                   </Bar>
@@ -201,10 +197,10 @@ export default function AffiliateDashboard() {
             </p>
             {finData.some(d => d.value > 0) ? (
               <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={finData} barSize={52} layout="vertical">
-                  <XAxis type="number" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(v) => fmt(v)} />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} width={80} />
-                  <Tooltip formatter={(v) => [fmt(Number(v)), 'Valor']} contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 13 }} />
+                <BarChart data={finData} barSize={40} layout="vertical">
+                  <XAxis type="number" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(v) => fmt(v)} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} width={72} />
+                  <Tooltip formatter={(v) => [fmt(Number(v)), 'Valor']} contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }} />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]}>
                     <Cell fill="#D1B46A" />
                     <Cell fill="#16a34a" />
