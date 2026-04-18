@@ -96,6 +96,72 @@ export const userRoleColor: Record<string, string> = {
   AFFILIATE: '#D1B46A',
 };
 
+/** Labels pt-BR para tipo de seguro */
+export const insuranceTypeLabel: Record<string, string> = {
+  AUTO:        'Automóvel',
+  RESIDENCIAL: 'Residencial',
+  EMPRESARIAL: 'Empresarial',
+  VIDA:        'Vida',
+  PREVIDENCIA: 'Previdência',
+  SAUDE:       'Saúde',
+  ODONTO:      'Odonto',
+  VIAGEM:      'Viagem',
+  RC:          'RC',
+  EQUIPAMENTOS:'Equipamentos',
+  OUTROS:      'Outros',
+};
+
+/** Cor por tipo de seguro */
+export const insuranceTypeColor: Record<string, string> = {
+  AUTO:        '#2563eb',
+  RESIDENCIAL: '#16a34a',
+  EMPRESARIAL: '#0B2442',
+  VIDA:        '#9333ea',
+  PREVIDENCIA: '#7c3aed',
+  SAUDE:       '#dc2626',
+  ODONTO:      '#0891b2',
+  VIAGEM:      '#ea580c',
+  RC:          '#65a30d',
+  EQUIPAMENTOS:'#ca8a04',
+  OUTROS:      '#6b7280',
+};
+
+/** Labels pt-BR para status de vigência da apólice */
+export const policyVigenciaLabel: Record<string, string> = {
+  ACTIVE:        'Ativa',
+  EXPIRING_SOON: 'A Vencer',
+  EXPIRED:       'Vencida',
+  CANCELED:      'Cancelada',
+  RENEWED:       'Renovada',
+};
+
+/** Cor por status de vigência */
+export const policyVigenciaColor: Record<string, string> = {
+  ACTIVE:        '#16a34a',
+  EXPIRING_SOON: '#d97706',
+  EXPIRED:       '#dc2626',
+  CANCELED:      '#6b7280',
+  RENEWED:       '#2563eb',
+};
+
+/** Labels pt-BR para status de comissão da apólice (recebimento da seguradora) */
+export const comissaoPagaLabel: Record<string, string> = {
+  PAGA:     'Paga',
+  PENDENTE: 'Pendente',
+};
+
+/** Cor por status de comissão da apólice */
+export const comissaoPagaColor: Record<string, string> = {
+  PAGA:     '#16a34a',
+  PENDENTE: '#d97706',
+};
+
+/** Labels pt-BR para tipo de emissão */
+export const tipoEmissaoLabel: Record<string, string> = {
+  NOVO:      'Novo',
+  RENOVACAO: 'Renovação',
+};
+
 /** Estilo padrão para botões de ação em tabelas */
 export function btnStyle(bg: string): React.CSSProperties {
   return {

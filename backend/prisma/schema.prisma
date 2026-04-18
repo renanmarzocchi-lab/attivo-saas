@@ -106,6 +106,16 @@ enum InsuranceStatus {
   RENEWED
 }
 
+enum TipoEmissao {
+  NOVO
+  RENOVACAO
+}
+
+enum ComissaoPagaStatus {
+  PAGA
+  PENDENTE
+}
+
 enum NotificationChannel {
   SYSTEM
   WHATSAPP
@@ -550,12 +560,17 @@ model InsuranceRecord {
   premiumAmount       Decimal?            @db.Decimal(12, 2)
   estimatedCommission Decimal?            @db.Decimal(12, 2)
   policyNumber        String?             @unique
+  numeroCi            String?
+  tipoEmissao         TipoEmissao         @default(NOVO)
   proposalNumber      String?
   startDate           DateTime?
   endDate             DateTime?
   renewalReminderDays Int                 @default(30)
   renewalAlertDate    DateTime?
   status              InsuranceStatus     @default(ACTIVE)
+  percComissao        Decimal?            @db.Decimal(6, 4)
+  comissaoPaga        ComissaoPagaStatus  @default(PENDENTE)
+  dataPagamentoComissao DateTime?
   notes               String?
   // Inteligencia comercial
   score               Int                 @default(0)

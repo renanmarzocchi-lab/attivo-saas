@@ -65,6 +65,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <nav style={{ display: 'grid', gap: 2 }}>
         <NavLink href="/admin/dashboard"    label="📊 Dashboard" />
         <NavLink href="/admin/affiliates"   label="👥 Afiliados" />
+        <NavLink href="/admin/policies"     label="🛡️ Apólices" />
         <NavLink href="/admin/conversions"  label="🎯 Conversões" />
         <NavLink href="/admin/commissions"  label="💰 Comissões" />
         <NavLink href="/admin/payments"     label="💳 Pagamentos" />
