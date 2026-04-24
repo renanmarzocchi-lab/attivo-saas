@@ -1,0 +1,765 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =========================================================
+// ENUMS
+// =========================================================
+
+enum UserRole {
+  MASTER_ADMIN
+  AFFILIATE
+  BROKER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+enum AffiliateStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  BLOCKED
+}
+
+enum ConversionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELED
+}
+
+enum CommissionStatus {
+  PENDING
+  AVAILABLE
+  PAID
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+enum SessionStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
+enum InsuranceType {
+  AUTO
+  RESIDENCIAL
+  EMPRESARIAL
+  VIDA
+  PREVIDENCIA
+  SAUDE
+  ODONTO
+  VIAGEM
+  RC
+  EQUIPAMENTOS
+  OUTROS
+}
+
+// Pipeline de vendas — estágios em ordem de progressão
+enum InsuranceStage {
+  LEAD
+  CONTATO_INICIAL
+  EM_COTACAO
+  COTADO
+  PROPOSTA_ENVIADA
+  PROPOSTA_ACEITA
+  NEGOCIACAO
+  APOLICE_EMITIDA
+  PERDIDO
+  CANCELADO
+}
+
+enum InsuranceSourceType {
+  DIRECT
+  AFFILIATE
+  SITE
+  WHATSAPP
+  MANUAL
+}
+
+enum InsuranceStatus {
+  ACTIVE
+  EXPIRING_SOON
+  EXPIRED
+  CANCELED
+  RENEWED
+}
+
+enum NotificationChannel {
+  SYSTEM
+  WHATSAPP
+  EMAIL
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum WhatsAppStatus {
+  PENDING
+  SENT
+  FAILED
+  DELIVERED
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// --- Motor Comercial ---
+
+enum LeadSource {
+  AFFILIATE
+  ORGANIC
+  CAMPAIGN
+  WHATSAPP
+  SITE
+  INDICATION
+  RENEWAL
+  MANUAL
+}
+
+enum LeadStatus {
+  NEW
+  CONTACT_ATTEMPTED
+  IN_PROGRESS
+  CONVERTED
+  LOST
+  DISQUALIFIED
+}
+
+enum TaskType {
+  FOLLOWUP
+  RENEWAL
+  CALL
+  MEETING
+  DOCUMENT
+  MANUAL
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum AutomationTrigger {
+  LEAD_CREATED
+  LEAD_ASSIGNED
+  STAGE_CHANGED_CONTATO_INICIAL
+  STAGE_CHANGED_EM_COTACAO
+  STAGE_CHANGED_COTADO
+  STAGE_CHANGED_PROPOSTA_ENVIADA
+  STAGE_CHANGED_PROPOSTA_ACEITA
+  STAGE_CHANGED_NEGOCIACAO
+  STAGE_CHANGED_APOLICE_EMITIDA
+  STAGE_CHANGED_PERDIDO
+  NO_ACTIVITY_48H
+  RENEWAL_30_DAYS
+  RENEWAL_15_DAYS
+  RENEWAL_7_DAYS
+}
+
+enum AutomationLogStatus {
+  PENDING
+  SENT
+  FAILED
+  SKIPPED
+}
+
+enum LossRisk {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AlertType {
+  LEAD_STALE
+  PROPOSAL_NO_RESPONSE
+  TASK_OVERDUE
+  BROKER_INACTIVE
+  CONVERSION_DROP
+  PIPELINE_STUCK
+  RENEWAL_RISK
+  HIGH_SCORE_NO_ACTION
+  LOSS_RISK_HIGH
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  PAID
+  REJECTED
+}
+
+enum CommissionOwnerType {
+  AFFILIATE
+  BROKER
+}
+
+// =========================================================
+// MODELS
+// =========================================================
+
+model Tenant {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String       @unique
+  status    TenantStatus @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  users            User[]
+  insuranceRecords InsuranceRecord[] @relation("InsuranceTenant")
+  leads            Lead[]            @relation("LeadTenant")
+  automationRules  AutomationRule[]
+}
+
+model User {
+  id           String     @id @default(cuid())
+  tenantId     String?
+  tenant       Tenant?    @relation(fields: [tenantId], references: [id])
+  name         String
+  email        String     @unique
+  passwordHash String
+  document     String?    @unique
+  role         UserRole
+  status       UserStatus @default(INACTIVE)
+  affiliateId  String?    @unique
+  affiliate    Affiliate? @relation(fields: [affiliateId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  commissionRate    Decimal    @default(0.0000) @db.Decimal(6, 4)
+  pixKey            String?
+
+  sessions          Session[]
+  createdInsurances InsuranceRecord[]     @relation("CreatedInsurance")
+  ownedInsurances   InsuranceRecord[]     @relation("OwnedInsurance")
+  attachments       InsuranceAttachment[]
+  timelineEntries   InsuranceTimeline[]
+  notifications     Notification[]
+  brokerGoals       BrokerGoal[]
+  assignedLeads     Lead[]                @relation("AssignedLeads")
+  tasks             Task[]
+  alerts            Alert[]               @relation("BrokerAlerts")
+  brokerCommissions BrokerCommission[]
+  withdrawalRequests WithdrawalRequest[]  @relation("WithdrawalRequester")
+}
+
+model Session {
+  id               String        @id @default(cuid())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id])
+  refreshTokenHash String
+  userAgent        String?
+  ipAddress        String?
+  status           SessionStatus @default(ACTIVE)
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime      @default(now())
+
+  @@index([userId])
+  @@index([refreshTokenHash])
+}
+
+model Affiliate {
+  id             String          @id @default(cuid())
+  name           String
+  document       String          @unique
+  email          String          @unique
+  phone          String?
+  cityUf         String?
+  pixKey         String?
+  refCode        String          @unique
+  commissionRate Decimal         @default(0.1500) @db.Decimal(6, 4)
+  status         AffiliateStatus @default(PENDING)
+  approvedAt     DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  user                User?
+  clicks              AffiliateClick[]
+  leads               AffiliateLead[]
+  conversions         AffiliateConversion[]
+  commissions         AffiliateCommission[]
+  payments            AffiliatePayment[]
+  documentAcceptances AffiliateDocumentAcceptance[]
+  insuranceRecords    InsuranceRecord[]
+  commercialLeads     Lead[]
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  title      String
+  version    String
+  hash       String
+  isCurrent  Boolean  @default(false)
+  isRequired Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  acceptances AffiliateDocumentAcceptance[]
+}
+
+model AffiliateDocumentAcceptance {
+  id                String          @id @default(cuid())
+  affiliateId       String
+  affiliate         Affiliate       @relation(fields: [affiliateId], references: [id])
+  documentVersionId String
+  documentVersion   DocumentVersion @relation(fields: [documentVersionId], references: [id])
+  ipAddress         String?
+  userAgent         String?
+  acceptedAt        DateTime        @default(now())
+
+  @@unique([affiliateId, documentVersionId])
+}
+
+model AffiliateClick {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+  refCode     String
+  url         String?
+  ipAddress   String?
+  userAgent   String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  createdAt   DateTime  @default(now())
+}
+
+model AffiliateLead {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+  refCode     String
+  name        String?
+  email       String?
+  phone       String?
+  source      String?
+  createdAt   DateTime  @default(now())
+}
+
+model AffiliateConversion {
+  id              String           @id @default(cuid())
+  affiliateId     String
+  affiliate       Affiliate        @relation(fields: [affiliateId], references: [id])
+  refCode         String
+  customerName    String?
+  customerEmail   String?
+  customerPhone   String?
+  product         String?
+  insurer         String?
+  grossAmount     Decimal          @db.Decimal(12, 2)
+  commissionBase  Decimal          @db.Decimal(12, 2)
+  commissionRate  Decimal          @db.Decimal(6, 4)
+  commissionValue Decimal          @db.Decimal(12, 2)
+  status          ConversionStatus @default(PENDING)
+  occurredAt      DateTime
+  createdAt       DateTime         @default(now())
+
+  commission AffiliateCommission?
+}
+
+model AffiliateCommission {
+  id              String              @id @default(cuid())
+  affiliateId     String
+  affiliate       Affiliate           @relation(fields: [affiliateId], references: [id])
+  conversionId    String              @unique
+  conversion      AffiliateConversion @relation(fields: [conversionId], references: [id])
+  amount          Decimal             @db.Decimal(12, 2)
+  rate            Decimal             @db.Decimal(6, 4)
+  status          CommissionStatus    @default(PENDING)
+  competenceMonth String
+  createdAt       DateTime            @default(now())
+
+  paymentItem       AffiliatePaymentItem?
+  withdrawalRequest WithdrawalRequest?
+}
+
+model AffiliatePayment {
+  id          String        @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate     @relation(fields: [affiliateId], references: [id])
+  totalAmount Decimal       @db.Decimal(12, 2)
+  status      PaymentStatus @default(PAID)
+  paidAt      DateTime?
+  reference   String?
+  createdAt   DateTime      @default(now())
+
+  items AffiliatePaymentItem[]
+}
+
+model AffiliatePaymentItem {
+  id           String              @id @default(cuid())
+  paymentId    String
+  payment      AffiliatePayment    @relation(fields: [paymentId], references: [id])
+  commissionId String              @unique
+  commission   AffiliateCommission @relation(fields: [commissionId], references: [id])
+  amount       Decimal             @db.Decimal(12, 2)
+  createdAt    DateTime            @default(now())
+}
+
+// ---- LEAD (pre-venda, antes de virar InsuranceRecord) ----
+model Lead {
+  id               String        @id @default(cuid())
+  tenantId         String?
+  tenant           Tenant?       @relation("LeadTenant", fields: [tenantId], references: [id])
+  name             String
+  phone            String?
+  email            String?
+  source           LeadSource    @default(MANUAL)
+  insuranceType    InsuranceType?
+  affiliateId      String?
+  affiliate        Affiliate?    @relation(fields: [affiliateId], references: [id])
+  affiliateRefCode String?
+  assignedBrokerId String?
+  assignedBroker   User?         @relation("AssignedLeads", fields: [assignedBrokerId], references: [id])
+  status           LeadStatus    @default(NEW)
+  notes            String?
+  // ID do InsuranceRecord gerado na conversao
+  convertedToId    String?
+  // Inteligencia comercial
+  score            Int           @default(0)
+  lossRisk         LossRisk      @default(LOW)
+  lastInteractionAt DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  tasks          Task[]
+  automationLogs AutomationLog[]
+  alerts         Alert[]
+
+  @@index([tenantId])
+  @@index([assignedBrokerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ---- TASK (follow-up, renovação, manual) ----
+model Task {
+  id          String       @id @default(cuid())
+  tenantId    String?
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  insuranceId String?
+  insurance   InsuranceRecord? @relation(fields: [insuranceId], references: [id])
+  leadId      String?
+  lead        Lead?        @relation(fields: [leadId], references: [id])
+  type        TaskType
+  priority    TaskPriority @default(MEDIUM)
+  title       String
+  dueDate     DateTime
+  completed   Boolean      @default(false)
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([dueDate])
+  @@index([completed])
+}
+
+// ---- AUTOMATION RULE ----
+model AutomationRule {
+  id              String            @id @default(cuid())
+  tenantId        String?
+  tenant          Tenant?           @relation(fields: [tenantId], references: [id])
+  name            String
+  description     String?
+  trigger         AutomationTrigger
+  channel         NotificationChannel
+  delayHours      Int               @default(0)
+  messageTemplate String
+  isActive        Boolean           @default(true)
+  createdByUserId String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  logs AutomationLog[]
+
+  @@index([tenantId])
+  @@index([trigger])
+  @@index([isActive])
+}
+
+// ---- AUTOMATION LOG ----
+model AutomationLog {
+  id           String              @id @default(cuid())
+  ruleId       String
+  rule         AutomationRule      @relation(fields: [ruleId], references: [id])
+  leadId       String?
+  lead         Lead?               @relation(fields: [leadId], references: [id])
+  insuranceId  String?
+  targetPhone  String?
+  targetEmail  String?
+  status       AutomationLogStatus @default(PENDING)
+  executedAt   DateTime?
+  errorMessage String?
+  createdAt    DateTime            @default(now())
+
+  @@index([ruleId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model InsuranceRecord {
+  id                  String              @id @default(cuid())
+  tenantId            String?
+  tenant              Tenant?             @relation("InsuranceTenant", fields: [tenantId], references: [id])
+  type                InsuranceType
+  stage               InsuranceStage      @default(LEAD)
+  insurer             String?
+  customerName        String
+  customerDocument    String
+  customerEmail       String?
+  customerPhone       String?
+  customerCityUf      String?
+  sourceType          InsuranceSourceType @default(MANUAL)
+  affiliateId         String?
+  affiliate           Affiliate?          @relation(fields: [affiliateId], references: [id])
+  refCode             String?
+  leadId              String?
+  createdByUserId     String
+  createdBy           User                @relation("CreatedInsurance", fields: [createdByUserId], references: [id])
+  ownerUserId         String
+  owner               User                @relation("OwnedInsurance", fields: [ownerUserId], references: [id])
+  premiumAmount       Decimal?            @db.Decimal(12, 2)
+  estimatedCommission Decimal?            @db.Decimal(12, 2)
+  policyNumber        String?             @unique
+  proposalNumber      String?
+  startDate           DateTime?
+  endDate             DateTime?
+  renewalReminderDays Int                 @default(30)
+  renewalAlertDate    DateTime?
+  status              InsuranceStatus     @default(ACTIVE)
+  notes               String?
+  // Inteligencia comercial
+  score               Int                 @default(0)
+  lossRisk            LossRisk            @default(LOW)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  attachments      InsuranceAttachment[]
+  timeline         InsuranceTimeline[]
+  notifications    Notification[]
+  tasks            Task[]
+  alerts           Alert[]
+  brokerCommission BrokerCommission?
+
+  @@index([tenantId])
+  @@index([ownerUserId])
+  @@index([status])
+  @@index([stage])
+}
+
+model InsuranceAttachment {
+  id                String          @id @default(cuid())
+  insuranceRecordId String
+  insuranceRecord   InsuranceRecord @relation(fields: [insuranceRecordId], references: [id])
+  originalFileName  String
+  storedFileName    String
+  fileUrl           String
+  mimeType          String?
+  size              Int?
+  storageProvider   String          @default("local")
+  uploadedByUserId  String
+  uploadedBy        User            @relation(fields: [uploadedByUserId], references: [id])
+  createdAt         DateTime        @default(now())
+}
+
+model InsuranceTimeline {
+  id                String          @id @default(cuid())
+  insuranceRecordId String
+  insuranceRecord   InsuranceRecord @relation(fields: [insuranceRecordId], references: [id])
+  action            String
+  description       String?
+  createdByUserId   String?
+  createdBy         User?           @relation(fields: [createdByUserId], references: [id])
+  createdAt         DateTime        @default(now())
+}
+
+model Notification {
+  id                String              @id @default(cuid())
+  tenantId          String?
+  channel           NotificationChannel @default(SYSTEM)
+  targetUserId      String
+  targetUser        User                @relation(fields: [targetUserId], references: [id])
+  insuranceRecordId String?
+  insuranceRecord   InsuranceRecord?    @relation(fields: [insuranceRecordId], references: [id])
+  message           String
+  templateKey       String?
+  payload           Json?
+  status            NotificationStatus  @default(PENDING)
+  attempts          Int                 @default(0)
+  lastError         String?
+  scheduledAt       DateTime?
+  sentAt            DateTime?
+  createdAt         DateTime            @default(now())
+
+  @@index([tenantId])
+  @@index([status])
+}
+
+model BrokerGoal {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  competenceMonth String
+  targetRevenue   Decimal  @db.Decimal(12, 2)
+  targetPolicies  Int
+  createdAt       DateTime @default(now())
+
+  @@unique([userId, competenceMonth])
+}
+
+model WhatsAppMessageLog {
+  id           String         @id @default(cuid())
+  targetPhone  String
+  message      String
+  provider     String
+  status       WhatsAppStatus @default(PENDING)
+  externalId   String?
+  errorMessage String?
+  createdAt    DateTime       @default(now())
+  sentAt       DateTime?
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EmailMessageLog {
+  id           String      @id @default(cuid())
+  to           String
+  subject      String
+  templateKey  String?
+  provider     String
+  status       EmailStatus @default(PENDING)
+  externalId   String?
+  errorMessage String?
+  createdAt    DateTime    @default(now())
+  sentAt       DateTime?
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model RenewalRunLog {
+  id                   String   @id @default(cuid())
+  runDate              String   @unique
+  processedCount       Int      @default(0)
+  createdNotifications Int      @default(0)
+  errorsCount          Int      @default(0)
+  createdAt            DateTime @default(now())
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  action      String
+  entityType  String
+  entityId    String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+}
+
+// ---- BROKER COMMISSION ----
+model BrokerCommission {
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id])
+  insuranceId     String           @unique
+  insurance       InsuranceRecord  @relation(fields: [insuranceId], references: [id])
+  amount          Decimal          @db.Decimal(12, 2)
+  rate            Decimal          @db.Decimal(6, 4)
+  status          CommissionStatus @default(PENDING)
+  competenceMonth String
+  createdAt       DateTime         @default(now())
+
+  withdrawalRequest WithdrawalRequest?
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ---- WITHDRAWAL REQUEST ----
+model WithdrawalRequest {
+  id                    String             @id @default(cuid())
+  ownerType             CommissionOwnerType
+  requestedByUserId     String
+  requestedBy           User               @relation("WithdrawalRequester", fields: [requestedByUserId], references: [id])
+  affiliateCommissionId String?            @unique
+  affiliateCommission   AffiliateCommission? @relation(fields: [affiliateCommissionId], references: [id])
+  brokerCommissionId    String?            @unique
+  brokerCommission      BrokerCommission?  @relation(fields: [brokerCommissionId], references: [id])
+  amount                Decimal            @db.Decimal(12, 2)
+  pixKey                String?
+  status                WithdrawalStatus   @default(PENDING)
+  notes                 String?
+  requestedAt           DateTime           @default(now())
+  resolvedAt            DateTime?
+  resolvedByUserId      String?
+
+  @@index([status])
+  @@index([requestedByUserId])
+}
+
+// ---- ALERT (inteligencia comercial) ----
+model Alert {
+  id          String        @id @default(cuid())
+  tenantId    String?
+  type        AlertType
+  severity    AlertSeverity @default(WARNING)
+  title       String
+  message     String
+  leadId      String?
+  lead        Lead?         @relation(fields: [leadId], references: [id])
+  insuranceId String?
+  insurance   InsuranceRecord? @relation(fields: [insuranceId], references: [id])
+  brokerId    String?
+  broker      User?         @relation("BrokerAlerts", fields: [brokerId], references: [id])
+  isRead      Boolean       @default(false)
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@index([tenantId])
+  @@index([isRead])
+  @@index([brokerId])
+  @@index([createdAt])
+  @@index([type])
+}

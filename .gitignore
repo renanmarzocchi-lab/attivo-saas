@@ -1,0 +1,16 @@
+node_modules
+.env
+.env.local
+.env.production.local
+.next
+dist
+coverage
+backend/node_modules
+frontend/node_modules
+
+# Arquivos de produção com dados reais (nunca versionar)
+backend/.env
+frontend/.env.local
+.env.docker
+uploads/
+*.log
