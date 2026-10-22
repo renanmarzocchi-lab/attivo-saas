@@ -29,6 +29,9 @@ jobs:
   publicar:
     name: Publicar na VPS
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://attivocorretora.com.br
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +47,7 @@ jobs:
       - name: Configurar SSH
         run: |
           mkdir -p ~/.ssh
+          if [ -z "${{ secrets.VPS_HOST }}" ] || [ -z "${{ secrets.VPS_SSH_KEY }}" ]; then echo "::error::Secrets VPS_HOST/VPS_SSH_KEY não disponíveis"; exit 1; fi
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
