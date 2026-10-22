@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /afiliados/
+
+Sitemap: https://attivocorretora.com.br/sitemap.xml
