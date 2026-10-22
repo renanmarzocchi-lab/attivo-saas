@@ -1,0 +1,115 @@
+# Publica o site institucional (pasta site-institucional/) na VPS.
+#
+# Disparo: push na branch site-institucional que altere a pasta, ou manual.
+# Segurança:
+#   1. Localiza a pasta do site atual na VPS. Se não achar exatamente uma, para sem alterar nada.
+#   2. Faz backup completo em /root/attivo-site-backups/ antes de trocar os arquivos.
+#   3. Confere no ar se a versão nova está sendo servida.
+#
+# Usa os mesmos secrets do deploy do sistema: VPS_HOST, VPS_USER, VPS_SSH_KEY.
+#
+# Para voltar ao site anterior, na VPS:
+#   tar -xzf /root/attivo-site-backups/<arquivo>.tar.gz -C <pasta do site>
+
+name: Publicar site institucional
+
+on:
+  push:
+    branches: [ site-institucional ]
+    paths:
+      - 'site-institucional/**'
+      - '.github/workflows/site-institucional.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: site-institucional
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    name: Publicar na VPS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Empacotar site
+        run: |
+          tar -C site-institucional \
+              --exclude='./_fonte' --exclude='./README.md' \
+              --exclude='./vercel.json' --exclude='./.vercelignore' \
+              -czf /tmp/site.tar.gz .
+          tar -tzf /tmp/site.tar.gz | head -60
+
+      - name: Configurar SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Localizar pasta do site na VPS
+        id: root
+        run: |
+          SSH="ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=30 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}"
+          $SSH 'bash -s' > /tmp/root.txt <<'EOS'
+          set -u
+          # candidatos: pastas com o index.html do site atual (ou de uma versão já publicada por este fluxo)
+          CANDS=$( (grep -rls --include=index.html -e 'data-preserve-affiliate' -e 'SUSEP 262177403' /var/www /srv /opt /home /root /usr/share/nginx 2>/dev/null || true) \
+                   | xargs -r -n1 dirname | sort -u )
+          OK=""
+          for d in $CANDS; do
+            if [ -f "$d/index.html" ] && [ -d "$d/sobre" ] && [ -d "$d/contato" ] && [ -d "$d/assets" ]; then OK="$OK $d"; fi
+          done
+          echo "candidatos:$OK" >&2
+          echo "nginx roots:" >&2
+          (nginx -T 2>/dev/null | grep -E '^\s*(server_name|root)\s' | sed 's/^/  /' >&2) || true
+          set -- $OK
+          if [ "$#" -ne 1 ]; then echo "ERRO: esperado 1 candidato, achei $#" >&2; exit 3; fi
+          echo "$1"
+          EOS
+          ROOT=$(tail -1 /tmp/root.txt)
+          case "$ROOT" in /*) ;; *) echo "pasta inválida: $ROOT"; exit 1;; esac
+          if [ "$ROOT" = "/" ] || [ "$(echo "$ROOT" | tr -cd '/' | wc -c)" -lt 2 ]; then echo "pasta perigosa: $ROOT"; exit 1; fi
+          echo "Pasta do site: $ROOT"
+          echo "dir=$ROOT" >> "$GITHUB_OUTPUT"
+
+      - name: Backup e publicação
+        env:
+          ROOT: ${{ steps.root.outputs.dir }}
+        run: |
+          SSH="ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=30 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no /tmp/site.tar.gz "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/attivo-site-novo.tar.gz"
+          $SSH "ROOT='$ROOT' bash -s" <<'EOS'
+          set -euo pipefail
+          TS=$(date +%Y%m%d-%H%M%S)
+          BK=/root/attivo-site-backups
+          mkdir -p "$BK"
+          OWNER=$(stat -c '%U:%G' "$ROOT")
+          tar -C "$ROOT" -czf "$BK/site-$TS.tar.gz" .
+          echo "Backup: $BK/site-$TS.tar.gz ($(du -h "$BK/site-$TS.tar.gz" | cut -f1))"
+          STAGE=$(mktemp -d)
+          tar -xzf /tmp/attivo-site-novo.tar.gz -C "$STAGE"
+          test -f "$STAGE/index.html" && test -f "$STAGE/assets/site.css"
+          find "$ROOT" -mindepth 1 -delete
+          cp -a "$STAGE/." "$ROOT/"
+          chown -R "$OWNER" "$ROOT"
+          find "$ROOT" -type d -exec chmod 755 {} +
+          find "$ROOT" -type f -exec chmod 644 {} +
+          rm -rf "$STAGE" /tmp/attivo-site-novo.tar.gz
+          ls "$BK" | sort | head -n -10 | xargs -r -I{} rm -f "$BK/{}"
+          echo "Publicado em $ROOT"
+          EOS
+
+      - name: Conferir no ar
+        run: |
+          sleep 3
+          for u in / /seguros/ /sobre/ /contato/ /seguro-auto/ /afiliados/ /sitemap.xml /assets/site.css /favicon.svg; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://attivocorretora.com.br$u")
+            echo "$code $u"
+          done
+          curl -s https://attivocorretora.com.br/ | grep -q 'SUSEP 262177403' && echo "Versão nova no ar" || { echo "::error::Página inicial não está servindo a versão nova"; exit 1; }
+
+      - name: Limpar chave SSH
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
