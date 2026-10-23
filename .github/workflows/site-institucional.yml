@@ -14,11 +14,7 @@
 name: Publicar site institucional
 
 on:
-  push:
-    branches: [ site-institucional ]
-    paths:
-      - 'site-institucional/**'
-      - '.github/workflows/site-institucional.yml'
+  # só manual: precisa dos secrets VPS_HOST, VPS_USER e VPS_SSH_KEY cadastrados
   workflow_dispatch:
 
 concurrency:

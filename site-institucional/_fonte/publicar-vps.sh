@@ -76,12 +76,38 @@ find "$ROOT" -type d -exec chmod 755 {} +
 find "$ROOT" -type f -exec chmod 644 {} +
 rm -rf "$NOVO"
 
-echo "== 5. Conferindo no ar"
+echo "== 5. Ajustando o cache do nginx (HTML sempre atualizado)"
+CONF=$(grep -rlE "root[[:space:]]+${ROOT};" /etc/nginx/sites-enabled /etc/nginx/conf.d 2>/dev/null | head -1 || true)
+if [ -z "$CONF" ]; then
+  echo "Arquivo do nginx não encontrado, cache não alterado."
+else
+  REAL=$(readlink -f "$CONF")
+  if grep -q 'attivo_expires' "$REAL"; then
+    echo "Cache já estava ajustado em $REAL"
+  else
+    NBK="$BK/nginx-$(basename "$REAL")-$TS.bak"
+    cp "$REAL" "$NBK"
+    TMP=$(mktemp)
+    { printf '# ATTIVO: HTML sem cache, arquivos estáticos por 7 dias\nmap $sent_http_content_type $attivo_expires {\n    default 7d;\n    ~text/html epoch;\n    ~xml epoch;\n}\n\n'; cat "$REAL"; } > "$TMP"
+    sed -i -E "s#^([[:space:]]*root[[:space:]]+${ROOT};)#\1\n    expires \$attivo_expires;#" "$TMP"
+    cp "$TMP" "$REAL"; rm -f "$TMP"
+    if nginx -t >/dev/null 2>&1; then
+      systemctl reload nginx && echo "Cache ajustado (backup da configuração: $NBK)"
+    else
+      cp "$NBK" "$REAL"
+      echo "Ajuste de cache recusado pelo nginx; configuração original restaurada."
+      nginx -t 2>&1 | tail -3
+    fi
+  fi
+fi
+
+echo "== 6. Conferindo no ar"
 sleep 1
-for u in / /seguros/ /sobre/ /contato/ /seguro-auto/ /afiliados/ /sitemap.xml /assets/site.css /favicon.svg; do
+for u in / /seguros/ /sobre/ /contato/ /seguro-auto/ /plano-de-saude/ /afiliados/ /sitemap.xml /assets/attivo.css /favicon.svg; do
   printf '%s %s\n' "$(curl -s -o /dev/null -w '%{http_code}' "https://attivocorretora.com.br$u")" "$u"
 done
-if curl -s https://attivocorretora.com.br/ | grep -q 'SUSEP 262177403'; then
+echo "Cache da página inicial: $(curl -sI https://attivocorretora.com.br/ | grep -i '^cache-control' | tr -d '\r' || echo 'sem cabeçalho')"
+if curl -s https://attivocorretora.com.br/ | grep -q 'attivo.css'; then
   echo "SITE NOVO NO AR"
 else
   echo "ATENCAO: a home ainda não mostra a versão nova"
