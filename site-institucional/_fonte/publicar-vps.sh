@@ -8,6 +8,14 @@ set -euo pipefail
 REPO=https://github.com/renanmarzocchi-lab/attivo-saas
 BRANCH=site-institucional
 APLICAR=${1:-}
+case "$APLICAR" in --aplicar*) APLICAR=--aplicar;; esac
+
+for bin in git curl; do
+  if ! command -v "$bin" >/dev/null 2>&1; then
+    echo "Instalando $bin..."
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$bin" >/dev/null || { apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$bin" >/dev/null; }
+  fi
+done
 
 echo "== 1. Localizando a pasta do site atual"
 CANDS=$( (grep -rls --include=index.html -e 'data-preserve-affiliate' -e 'SUSEP 262177403' \
