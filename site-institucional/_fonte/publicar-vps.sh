@@ -28,6 +28,14 @@ done
 echo "Candidatos: ${OK[*]:-nenhum}"
 echo "Configuração do nginx (server_name / root):"
 nginx -T 2>/dev/null | grep -E '^\s*(server_name|root)\s' | sed 's/^/   /' || true
+# fica só com a pasta que o nginx realmente serve
+NGX_ROOTS=$(nginx -T 2>/dev/null | awk '$1=="root"{gsub(/;/,"",$2); print $2}' | sort -u)
+SERVIDOS=()
+for d in "${OK[@]}"; do
+  if printf '%s\n' $NGX_ROOTS | grep -qx "$d"; then SERVIDOS+=("$d"); fi
+done
+if [ "${#SERVIDOS[@]}" -ge 1 ]; then OK=("${SERVIDOS[@]}"); fi
+echo "Servida pelo nginx: ${SERVIDOS[*]:-nenhuma}"
 if [ "${#OK[@]}" -ne 1 ]; then
   echo "PARADO: esperava encontrar exatamente 1 pasta do site e encontrei ${#OK[@]}. Nada foi alterado."
   exit 3
