@@ -49,8 +49,8 @@ NOVO=/tmp/attivo-site-novo
 rm -rf "$NOVO"
 git clone -q --depth 1 -b "$BRANCH" "$REPO" "$NOVO"
 SRC="$NOVO/site-institucional"
-test -f "$SRC/index.html" && test -f "$SRC/assets/site.css"
-grep -q 'SUSEP 262177403' "$SRC/index.html"
+test -f "$SRC/index.html" && test -f "$SRC/assets/attivo.css" || { echo "ERRO: arquivos do site novo não encontrados"; exit 5; }
+grep -q 'SUSEP 262177403' "$SRC/index.html" || { echo 'ERRO: versão baixada não confere'; exit 6; }
 echo "Arquivos novos: $(find "$SRC" -type f -not -path '*/_fonte/*' | wc -l)"
 
 if [ "$APLICAR" != "--aplicar" ]; then
