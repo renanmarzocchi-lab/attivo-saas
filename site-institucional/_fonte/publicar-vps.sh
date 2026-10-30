@@ -77,7 +77,7 @@ find "$ROOT" -type f -exec chmod 644 {} +
 rm -rf "$NOVO"
 
 echo "== 5. Ajustando o cache do nginx (HTML sempre atualizado)"
-CONF=$(grep -rlE "root[[:space:]]+${ROOT};" /etc/nginx/sites-enabled /etc/nginx/conf.d 2>/dev/null | head -1 || true)
+CONF=$(grep -RlE "root[[:space:]]+${ROOT};" /etc/nginx/sites-enabled /etc/nginx/conf.d /etc/nginx/nginx.conf 2>/dev/null | head -1 || true)
 if [ -z "$CONF" ]; then
   echo "Arquivo do nginx não encontrado, cache não alterado."
 else
