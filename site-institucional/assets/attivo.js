@@ -79,4 +79,22 @@
       if (w) { try { w.opener = null; } catch (e) {} } else { window.location.href = url; }
     });
   });
+
+  // aviso de cookies (LGPD) com consent mode do Google Analytics
+  var KEY = 'attivo_cookies';
+  var box = document.querySelector('.cookie');
+  function getC() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function setC(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+  function apply(v) {
+    try { if (typeof window.gtag === 'function') window.gtag('consent', 'update', { analytics_storage: v === 'aceito' ? 'granted' : 'denied' }); } catch (e) {}
+  }
+  if (box) {
+    if (!getC()) box.hidden = false;
+    box.querySelectorAll('[data-cookies]').forEach(function (b) {
+      b.addEventListener('click', function () { var v = b.getAttribute('data-cookies'); setC(v); apply(v); box.hidden = true; });
+    });
+    document.querySelectorAll('[data-cookies-open]').forEach(function (b) {
+      b.addEventListener('click', function () { box.hidden = false; var f = box.querySelector('button'); f && f.focus(); });
+    });
+  }
 })();

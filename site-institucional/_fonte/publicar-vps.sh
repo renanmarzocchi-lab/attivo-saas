@@ -103,7 +103,7 @@ fi
 
 echo "== 6. Conferindo no ar"
 sleep 1
-for u in / /seguros/ /sobre/ /contato/ /seguro-auto/ /plano-de-saude/ /afiliados/ /sitemap.xml /assets/attivo.css /favicon.svg; do
+for u in / /seguros/ /sobre/ /contato/ /sinistro/ /seguro-auto/ /plano-de-saude/ /politica-de-privacidade/ /afiliados/ /sitemap.xml /assets/attivo.css /favicon.svg; do
   printf '%s %s\n' "$(curl -s -o /dev/null -w '%{http_code}' "https://attivocorretora.com.br$u")" "$u"
 done
 echo "Cache da página inicial: $(curl -sI https://attivocorretora.com.br/ | grep -i '^cache-control' | tr -d '\r' || echo 'sem cabeçalho')"

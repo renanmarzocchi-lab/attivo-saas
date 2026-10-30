@@ -12,7 +12,7 @@ Site estático de attivocorretora.com.br. HTML, CSS e JS puros, sem build no ser
 
 No terminal da VPS (Hostinger > VPS > Web console), como root:
 
-    curl -fsSL "https://raw.githubusercontent.com/renanmarzocchi-lab/attivo-saas/site-institucional/site-institucional/_fonte/publicar-vps.sh?v=4" -o /root/publicar-site.sh && bash /root/publicar-site.sh --aplicar
+    curl -fsSL "https://raw.githubusercontent.com/renanmarzocchi-lab/attivo-saas/site-institucional/site-institucional/_fonte/publicar-vps.sh?v=5" -o /root/publicar-site.sh && bash /root/publicar-site.sh --aplicar
 
 O script faz backup do site atual, publica, ajusta o cache do nginx (HTML sem cache) e confere as páginas no ar.
 

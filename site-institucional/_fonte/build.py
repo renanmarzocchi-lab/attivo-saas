@@ -13,14 +13,14 @@ from icons import icon, WHATSAPP
 SCR = os.path.join(HERE, '..')
 OUT = os.path.join(SCR, 'site2')
 SITE = 'https://attivocorretora.com.br'
-V = '3'
+V = '4'
 import re as _re
 def _dims(f):
     vb = _re.search(r'viewBox="([^"]+)"', open(os.path.join(HERE, 'static', 'assets', f)).read()).group(1).split()
     return float(vb[2]), float(vb[3])
 LW, LH = _dims('logo.svg')
 NW, NH = _dims('logo-negativo.svg')
-LASTMOD = '2026-10-23'
+LASTMOD = '2026-10-30'
 WA_MSG = 'Olá! Vim pelo site da ATTIVO e gostaria de falar com um especialista.'
 
 
@@ -112,7 +112,7 @@ def head(path, title, desc, ld=None, robots='index,follow,max-image-preview:larg
 <link rel="stylesheet" href="/assets/attivo.css?v={V}">
 {pre}
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZNM2R7XQVC"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-ZNM2R7XQVC');</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}var _c=null;try{{_c=localStorage.getItem('attivo_cookies')}}catch(e){{}}gtag('consent','default',{{analytics_storage:_c==='aceito'?'granted':'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'}});gtag('js',new Date());gtag('config','G-ZNM2R7XQVC');</script>
 <script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)}</script>
 </head>
 <body>
@@ -130,7 +130,7 @@ def header(active):
     mm_items = lambda lst: ''.join(f'<a href="/{p["slug"]}/"><span class="ic">{icon(p["icon"])}</span>{p["name"]}</a>' for p in lst)
     return f'''<div class="topbar"><div class="wrap">
 <span class="hide-sm">Corretora independente em Americana/SP, atendendo todo o Brasil</span>
-<span class="topbar-links"><a href="tel:{PHONE_TEL}">{icon('phone')}{PHONE}</a><a class="hide-sm" href="mailto:{EMAIL}">{icon('mail')}{EMAIL}</a></span>
+<span class="topbar-links"><a href="/sinistro/">{icon('lifebuoy')}Precisa acionar o seguro?</a><a href="tel:{PHONE_TEL}">{icon('phone')}{PHONE}</a><a class="hide-sm" href="mailto:{EMAIL}">{icon('mail')}{EMAIL}</a></span>
 </div></div>
 <header class="header"><div class="wrap">
 <a class="brand" href="/" aria-label="ATTIVO Corretora de Seguros, página inicial"><img src="/assets/logo.svg" alt="ATTIVO Corretora de Seguros" width="{round(40*LW/LH)}" height="40"></a>
@@ -139,6 +139,7 @@ def header(active):
 <div class="drop" data-open="false"><button type="button" class="{seg_cur.strip()}" aria-expanded="false" aria-haspopup="true">Seguros{icon('chev')}</button>
 <div class="mega" role="menu">{mega}<a class="all" href="/seguros/">Ver todos os seguros{icon('arrow', 18)}</a></div></div>
 <a href="/seguros/#empresas">Para empresas</a>
+<a href="/sinistro/"{cur('sinistro')}>Sinistro</a>
 <a href="/sobre/"{cur('sobre')}>Sobre</a>
 <a href="/contato/"{cur('contato')}>Contato</a>
 </nav>
@@ -151,7 +152,7 @@ def header(active):
 <div class="mobile-menu" id="menu-mobile" data-open="false" role="dialog" aria-modal="true" aria-label="Menu">
 <div class="mm-head"><img src="/assets/logo.svg" alt="ATTIVO" width="{round(34*LW/LH)}" height="34" style="height:34px;width:auto"><button class="menu-btn mm-close" type="button" aria-label="Fechar menu">{icon('x')}</button></div>
 <nav aria-label="Menu mobile">
-<a href="/">Início</a><a href="/sobre/">Sobre a ATTIVO</a><a href="/contato/">Contato</a>
+<a href="/">Início</a><a href="/sinistro/">Precisa acionar o seguro?</a><a href="/sobre/">Sobre a ATTIVO</a><a href="/contato/">Contato</a>
 <div class="group">Para você</div>{mm_items(pes)}
 <div class="group">Para sua empresa</div>{mm_items(emp)}
 </nav>
@@ -180,13 +181,15 @@ def footer():
 <li>{HOURS}</li>
 <li>Americana/SP, atendimento em todo o Brasil</li>
 <li><a href="/sobre/">Sobre a ATTIVO</a></li>
+<li><a href="/sinistro/">Como acionar o seguro</a></li>
 </ul></div>
 </div>
 <div class="footer-bottom">
 <span>© 2026 ATTIVO Corretora de Seguros. {LEGAL}. CNPJ {CNPJ}. SUSEP {SUSEP}.</span>
-<span>A aceitação do seguro e as condições estão sujeitas às regras de cada seguradora.</span>
+<span><a href="/politica-de-privacidade/">Política de privacidade</a> · <button type="button" class="link-btn" data-cookies-open>Preferências de cookies</button></span>
 </div>
 </div></footer>
+<div class="cookie" role="region" aria-label="Aviso de cookies" hidden><p>Usamos cookies para entender como o site é usado e melhorar o atendimento. Você pode aceitar ou recusar. <a href="/politica-de-privacidade/">Saiba mais</a>.</p><div class="cookie-actions"><button type="button" class="btn btn-ghost" data-cookies="recusado">Recusar</button><button type="button" class="btn btn-primary" data-cookies="aceito">Aceitar</button></div></div>
 <a class="wa-float" href="https://wa.me/5519994241018" data-wa="{esc(WA_MSG)}" aria-label="Falar com a ATTIVO no WhatsApp">{WHATSAPP}<span>WhatsApp</span></a>
 <script src="/assets/attivo.js?v={V}" defer></script>
 </body>
@@ -271,7 +274,7 @@ def home():
     tiles_html = ''.join(
         f'<a class="tile {c}{" pos-low" if img == "seguro-saude" else ""}" href="/{slug_of[img]}/">{pic(img, n, "(max-width:640px) 100vw, (max-width:1040px) 50vw, 40vw")}<span class="go">{icon("arrow")}</span>'
         f'<div class="tile-body"><h3>{n}</h3><p>{t}</p></div></a>' for c, img, n, t in tiles)
-    tiles_html += f'<a class="tile t-f plain" href="/seguros/"><span class="go">{icon("arrow")}</span><div class="tile-body"><h3>E muito mais</h3><p>Odontológico, equipamentos, fiança locatícia, condomínio e outras proteções.</p></div></a>'
+    tiles_html += f'<a class="tile t-f plain" href="/seguros/"><span class="go">{icon("arrow")}</span><div class="tile-body"><span class="more-ic">{''.join(icon(i) for i in ('tooth','laptop','key','buildings','scale'))}</span><h3>E muito mais</h3><p>Odontológico, equipamentos, fiança locatícia, condomínio e outras proteções.</p></div></a>'
     emp = [p for p in PRODUCTS if p['group'] == 'empresa'] + [BY_SLUG['plano-de-saude']]
     biz_items = ''.join(f'<a class="biz-item" href="/{p["slug"]}/"><span class="ic">{icon(p["icon"])}</span><span><strong>{"Saúde e odonto para equipes" if p["slug"] == "plano-de-saude" else p["name"]}</strong><span>{p["short"]}</span></span></a>' for p in emp)
     body = f'''
@@ -280,7 +283,7 @@ def home():
 <h1>Seguro bem escolhido, explicado por quem entende.</h1>
 <p class="lead">A ATTIVO é uma corretora independente de Americana. Comparamos as principais seguradoras do país para você, sua família e sua empresa, e seguimos ao seu lado depois da contratação.</p>
 <div class="hero-actions">{wa_btn('Cotar pelo WhatsApp')}<a class="btn btn-ghost" href="/seguros/">Conhecer os seguros</a></div>
-<div class="hero-proof"><span class="stars" aria-hidden="true">{''.join(icon('star') for _ in range(5))}</span><span><strong>Clientes satisfeitos</strong> em Americana, Campinas e região</span></div>
+<ul class="hero-proof"><li>{icon('check')}Mais de 8 seguradoras comparadas</li><li>{icon('check')}Cotação gratuita</li><li>{icon('check')}Atendimento em todo o Brasil</li></ul>
 </div>
 <div class="hero-media">{pic('hero-familia', 'Família sorrindo na sala de casa', '(max-width:1040px) 100vw, 50vw', eager=True)}
 <div class="hero-badge"><span class="ic">{icon('shield')}</span><span><strong>Do orçamento ao sinistro</strong><span>Uma pessoa que conhece o seu caso</span></span></div></div>
@@ -304,6 +307,14 @@ def home():
 <div class="mosaic">{tiles_html}</div>
 </div></section>
 
+
+<section class="section tight"><div class="wrap"><div class="renew">
+<div class="renew-copy"><span class="kicker">Renovação</span><h2>Seu seguro vai vencer? A gente compara antes.</h2>
+<p class="lead">Mande a sua apólice atual pelo WhatsApp. Cotamos nas outras seguradoras mantendo o seu bônus e mostramos se dá para pagar menos ou ter mais cobertura pelo mesmo valor.</p>
+<ol class="renew-steps"><li><strong>Mande a apólice</strong><span>Foto ou PDF, pelo WhatsApp.</span></li><li><strong>A gente compara</strong><span>Mesmo bônus, outras seguradoras.</span></li><li><strong>Você decide</strong><span>Troca só se valer a pena.</span></li></ol>
+{wa_btn('Enviar minha apólice', 'Olá! Meu seguro vai vencer e quero comparar a renovação com a ATTIVO. Vou enviar a apólice atual.')}</div>
+<div class="renew-media">{pic('renovacao', 'Cliente revisando a apólice de seguro com a corretora', '(max-width:1040px) 100vw, 45vw')}</div>
+</div></div></section>
 <section class="section ink" id="empresas"><div class="wrap biz">
 <div><span class="kicker" style="color:#8FB0FF">Para sua empresa</span><h2>Seu negócio protegido para não parar.</h2>
 <p class="lead" style="margin-top:16px">Do pequeno comércio à indústria, analisamos a operação e montamos a proteção certa para patrimônio, frota, equipe e responsabilidades.</p>
@@ -518,6 +529,86 @@ def local(l):
     write(path, page(path, l['title'], l['desc'], None, body, ld, preload=l['img']))
 
 
+
+# ─── SINISTRO ────────────────────────────────────────────────────────────────
+SIN_FAQ = [('Preciso avisar a ATTIVO ou a seguradora primeiro?', 'Em emergência, ligue para a assistência 24h da seguradora, que está na sua apólice e no app dela. Logo depois, avise a gente pelo WhatsApp para acompanharmos o processo desde o início.'),
+           ('Qual o prazo para comunicar o sinistro?', 'Comunique o quanto antes. As condições gerais de cada seguradora definem prazos e a demora pode prejudicar a análise. Na dúvida, fale com a gente no mesmo dia.'),
+           ('Vou pagar franquia?', 'Depende do tipo de evento e da apólice. Em perda parcial do seguro auto, normalmente há franquia. Em perda total, roubo ou furto, normalmente não. Explicamos o seu caso.'),
+           ('E se a seguradora negar o sinistro?', 'Analisamos a negativa com base nas condições da apólice e, quando cabe, apresentamos recurso junto à seguradora.')]
+
+
+def sinistro():
+    tipos = [('car', 'Batida ou roubo do carro', ['Boletim de ocorrência (em roubo, furto ou acidente com vítima)', 'CNH e documento do veículo', 'Fotos do local e dos danos', 'Dados do outro veículo e do condutor, se houver']),
+             ('home', 'Problema em casa', ['Fotos dos danos antes de qualquer reparo', 'Orçamentos ou notas de conserto', 'Boletim de ocorrência em caso de roubo', 'Laudo técnico em danos elétricos, quando pedido']),
+             ('building', 'Ocorrência na empresa', ['Fotos e descrição do ocorrido', 'Relação dos bens atingidos com notas fiscais', 'Boletim de ocorrência, quando aplicável', 'Documentos contábeis em lucros cessantes']),
+             ('heart', 'Seguro de vida', ['Certidão de óbito ou laudos médicos', 'Documentos do segurado e dos beneficiários', 'Boletim de ocorrência em caso de acidente', 'Formulários da seguradora (a gente ajuda a preencher)'])]
+    tipos_html = ''.join(f'<div class="cover"><span class="ic">{icon(i)}</span><h3>{t}</h3><ul class="doclist">' + ''.join(f'<li>{d}</li>' for d in docs) + '</ul></div>' for i, t, docs in tipos)
+    body = f"""
+<section class="page-hero"><div class="wrap"><div class="grid"><div>
+<nav class="crumbs" aria-label="Você está em"><a href="/">Início</a><span aria-hidden="true">/</span><span>Sinistro</span></nav>
+<h1>Aconteceu alguma coisa? A gente resolve com você.</h1>
+<p class="lead">Se você é cliente ATTIVO, fale com a gente assim que puder. Orientamos o que fazer agora, quais documentos separar e acompanhamos a seguradora até o fim.</p>
+<div class="hero-actions">{wa_btn('Avisar a ATTIVO agora', 'Olá! Sou cliente da ATTIVO e preciso acionar o meu seguro.')}<a class="btn btn-ghost" href="tel:{PHONE_TEL}">{icon('phone')}Ligar {PHONE}</a></div>
+</div><div class="media">{pic('sinistro', 'Triângulo de sinalização na estrada após uma pane', '(max-width:1040px) 100vw, 45vw', eager=True)}</div></div></div></section>
+<section class="section"><div class="wrap">
+<div class="section-head"><div class="txt"><span class="kicker">Primeiros passos</span><h2>O que fazer nos primeiros minutos.</h2></div></div>
+<div class="steps">
+<div class="step"><h3>Garanta a segurança</h3><p>Sinalize o local, proteja as pessoas e, se houver feridos, ligue 192 (SAMU) ou 193 (Bombeiros). Em roubo ou furto, ligue 190.</p></div>
+<div class="step"><h3>Acione a assistência 24h</h3><p>Para guincho, chaveiro ou socorro, ligue para a central da seguradora. O número está na apólice, no cartão do seguro e no app da seguradora.</p></div>
+<div class="step"><h3>Avise a ATTIVO</h3><p>Mande uma mensagem com fotos e um resumo do que aconteceu. A partir daí a gente abre o aviso de sinistro e acompanha cada etapa.</p></div>
+</div></div></section>
+<section class="section mist"><div class="wrap">
+<div class="section-head"><div class="txt"><span class="kicker">Documentos</span><h2>O que costuma ser pedido.</h2><p class="lead">A lista final depende da seguradora e do tipo de ocorrência. Separe o que tiver e mande para a gente conferir.</p></div></div>
+<div class="covers cols-2">{tipos_html}</div>
+</div></section>
+<section class="section"><div class="wrap care">
+<div class="care-media"><div class="main">{pic('atendimento-telefone', 'Atendente da ATTIVO ao telefone', '(max-width:1040px) 100vw, 50vw')}</div></div>
+<div><span class="kicker">Depois do aviso</span><h2>Você não fica sozinho com a seguradora.</h2>
+<ul class="checks">
+<li><span class="ic">{icon('check')}</span><span><strong>Abrimos o aviso de sinistro</strong><span>Com os dados certos desde o começo, para evitar idas e vindas.</span></span></li>
+<li><span class="ic">{icon('check')}</span><span><strong>Acompanhamos a vistoria e a regulação</strong><span>Cobramos prazos e mantemos você informado.</span></span></li>
+<li><span class="ic">{icon('check')}</span><span><strong>Explicamos a indenização</strong><span>Franquia, valores e prazos de pagamento, em linguagem simples.</span></span></li>
+</ul>{wa_btn('Falar com a ATTIVO', 'Olá! Sou cliente da ATTIVO e preciso de ajuda com um sinistro.')}</div>
+</div></section>
+{faq_block('Dúvidas sobre sinistro.', SIN_FAQ)}
+"""
+    write('/sinistro/', page('/sinistro/', 'Sinistro: como acionar o seu seguro | ATTIVO Corretora',
+                             'Aconteceu um acidente, roubo ou dano? Veja o que fazer, quais documentos separar e fale com a ATTIVO para acompanhar o seu sinistro.',
+                             'sinistro', body, [crumbs_ld([('Início', '/'), ('Sinistro', '/sinistro/')]), faq_ld(SIN_FAQ)], preload='sinistro'))
+
+
+# ─── PRIVACIDADE ─────────────────────────────────────────────────────────────
+def privacidade():
+    body = f"""
+<section class="page-hero no-media"><div class="wrap"><div class="grid"><div>
+<nav class="crumbs" aria-label="Você está em"><a href="/">Início</a><span aria-hidden="true">/</span><span>Política de privacidade</span></nav>
+<h1>Política de privacidade</h1>
+<p class="lead">Como a ATTIVO trata os dados pessoais de quem usa este site, conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018).</p>
+</div></div></div></section>
+<section class="section tight"><div class="wrap"><div class="prose">
+<h2>Quem é o controlador</h2>
+<p>{LEGAL}, nome fantasia ATTIVO Corretora de Seguros, CNPJ {CNPJ}, com sede em Americana/SP, registrada na SUSEP sob o nº {SUSEP}. Contato para assuntos de privacidade: <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+<h2>Quais dados coletamos</h2>
+<p>Quando você preenche um formulário ou fala com a gente, recebemos os dados que você informa, como nome, telefone, e-mail, cidade e o tipo de seguro de interesse. Para fazer uma cotação, podemos pedir outras informações necessárias à análise do risco, como dados do veículo, do imóvel ou dos beneficiários.</p>
+<p>Se você aceitar os cookies, o Google Analytics registra dados de navegação de forma estatística, como páginas visitadas, tipo de dispositivo e cidade aproximada.</p>
+<h2>Para que usamos</h2>
+<p>Usamos os dados para responder o seu contato, elaborar cotações, intermediar a contratação com as seguradoras, prestar atendimento durante a vigência e no sinistro, cumprir obrigações legais e regulatórias e entender como melhorar o site.</p>
+<h2>Com quem compartilhamos</h2>
+<p>Compartilhamos dados apenas com as seguradoras e operadoras necessárias para a cotação e a contratação que você pediu, com prestadores que nos apoiam (como provedores de hospedagem e de mensagens) e com autoridades, quando exigido por lei. Não vendemos dados pessoais.</p>
+<h2>Cookies</h2>
+<p>O site só ativa cookies de análise depois que você aceita no aviso de cookies. Você pode mudar a escolha a qualquer momento em <button type="button" class="link-btn" data-cookies-open>preferências de cookies</button>.</p>
+<h2>Por quanto tempo guardamos</h2>
+<p>Pelo tempo necessário para atender a finalidade e pelos prazos exigidos pela regulação de seguros e pela legislação aplicável.</p>
+<h2>Seus direitos</h2>
+<p>Você pode pedir confirmação de tratamento, acesso, correção, anonimização, portabilidade, eliminação dos dados tratados com base no consentimento e informações sobre compartilhamento, além de revogar o consentimento. Basta escrever para <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+<p class="muted">Atualizada em 30 de outubro de 2026.</p>
+</div></div></section>
+"""
+    write('/politica-de-privacidade/', page('/politica-de-privacidade/', 'Política de privacidade | ATTIVO Corretora de Seguros',
+                                            'Como a ATTIVO Corretora de Seguros trata dados pessoais, conforme a LGPD.', None, body,
+                                            [crumbs_ld([('Início', '/'), ('Política de privacidade', '/politica-de-privacidade/')])]))
+
+
 def notfound():
     body = f'''<section class="page-hero no-media" style="padding:96px 0"><div class="wrap"><div class="grid"><div>
 <h1>Essa página não existe mais.</h1><p class="lead">Mas a gente continua aqui. Escolha um seguro ou fale direto com um especialista.</p>
@@ -533,7 +624,7 @@ def extras():
         f.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>ATTIVO</title><meta name="robots" content="noindex,follow">'
                 '<link rel="canonical" href="https://attivocorretora.com.br/"><meta http-equiv="refresh" content="0; url=/"><script>location.replace("/")</script>'
                 '</head><body><a href="/">Ir para a página inicial da ATTIVO</a></body></html>\n')
-    urls = [('/', '1.0'), ('/seguros/', '0.9'), ('/sobre/', '0.6'), ('/contato/', '0.7')]
+    urls = [('/', '1.0'), ('/seguros/', '0.9'), ('/sobre/', '0.6'), ('/contato/', '0.7'), ('/sinistro/', '0.7'), ('/politica-de-privacidade/', '0.3')]
     urls += [(f'/{p["slug"]}/', '0.9') for p in PRODUCTS] + [(f'/{l["slug"]}/', '0.8') for l in LOCAL]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     sm += [f'  <url><loc>{SITE}{u}</loc><lastmod>{LASTMOD}</lastmod><priority>{pr}</priority></url>' for u, pr in urls]
@@ -553,7 +644,7 @@ if __name__ == '__main__':
         shutil.rmtree(OUT)
     shutil.copytree(os.path.join(HERE, 'static'), OUT)
     shutil.copytree(os.path.join(SCR, 'img-out'), os.path.join(OUT, 'assets', 'img'))
-    home(); seguros(); sobre(); contato()
+    home(); seguros(); sobre(); contato(); sinistro(); privacidade()
     for p in PRODUCTS:
         product(p)
     for l in LOCAL:
