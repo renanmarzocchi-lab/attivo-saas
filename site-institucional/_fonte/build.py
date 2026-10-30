@@ -123,10 +123,22 @@ def head(path, title, desc, ld=None, robots='index,follow,max-image-preview:larg
 def header(active):
     pes = [p for p in PRODUCTS if p['group'] == 'pessoa']
     emp = [p for p in PRODUCTS if p['group'] == 'empresa']
-    mega = ''.join(f'<a href="/{p["slug"]}/"><span class="ic">{icon(p["icon"])}</span><span><strong>{p["name"]}</strong><span>{p["short"]}</span></span></a>'
-                   for p in PRODUCTS[:8])
+    item = lambda p, label=None: f'<a href="/{p["slug"]}/"><span class="ic">{icon(p["icon"])}</span><span><strong>{label or p["name"]}</strong><span>{p["short"]}</span></span></a>'
+    mega_pes = ''.join(item(p) for p in pes)
+    mega_emp = ''.join(item(p) for p in emp) + item(BY_SLUG['plano-de-saude'], 'Saúde e odonto para equipes')
     cur = lambda k: ' aria-current="page"' if active == k else ''
-    seg_cur = ' current' if active == 'seguros' else ''
+    dcur = lambda k: ' current' if active == k else ''
+    def drop(key, label, img, alt, title, text, cta, items, more):
+        return (f'<div class="drop" data-open="false"><button type="button" class="{dcur(key).strip()}" aria-expanded="false">{label}{icon("chev")}</button>'
+                f'<div class="mega"><div class="mega-feature">{pic(img, alt, "300px")}<div class="mega-feature-body"><strong>{title}</strong><span>{text}</span>'
+                f'<a class="btn btn-wa" href="https://wa.me/5519994241018" data-wa="{esc(cta)}">{WHATSAPP}Cotar agora</a></div></div>'
+                f'<div class="mega-list">{items}<a class="all" href="{more}">Ver todos os seguros{icon("arrow", 18)}</a></div></div></div>')
+    drop_pes = drop('pessoa', 'Para você', 'hero-familia', 'Família sorrindo na sala de casa', 'Para você e sua família',
+                    'Carro, casa, vida, saúde e viagem, comparando as principais seguradoras.',
+                    'Olá! Vim pelo site da ATTIVO e quero cotar um seguro para mim.', mega_pes, '/seguros/#voce')
+    drop_emp = drop('empresa', 'Para empresas', 'seguro-empresarial', 'Dona de pequeno negócio no balcão da loja', 'Para o seu negócio',
+                    'Patrimônio, frota, responsabilidade civil e benefícios para a equipe.',
+                    'Olá! Vim pelo site da ATTIVO e quero cotar um seguro para a minha empresa.', mega_emp, '/seguros/#empresas')
     mm_items = lambda lst: ''.join(f'<a href="/{p["slug"]}/"><span class="ic">{icon(p["icon"])}</span>{p["name"]}</a>' for p in lst)
     return f'''<div class="topbar"><div class="wrap">
 <span class="hide-sm">Corretora independente em Americana/SP, atendendo todo o Brasil</span>
@@ -136,9 +148,8 @@ def header(active):
 <a class="brand" href="/" aria-label="ATTIVO Corretora de Seguros, página inicial"><img src="/assets/logo.svg" alt="ATTIVO Corretora de Seguros" width="{round(40*LW/LH)}" height="40"></a>
 <nav class="nav" aria-label="Principal">
 <a href="/"{cur('home')}>Início</a>
-<div class="drop" data-open="false"><button type="button" class="{seg_cur.strip()}" aria-expanded="false">Seguros{icon('chev')}</button>
-<div class="mega">{mega}<a class="all" href="/seguros/">Ver todos os seguros{icon('arrow', 18)}</a></div></div>
-<a href="/seguros/#empresas">Para empresas</a>
+{drop_pes}
+{drop_emp}
 <a href="/sinistro/"{cur('sinistro')}>Sinistro</a>
 <a href="/sobre/"{cur('sobre')}>Sobre</a>
 <a href="/contato/"{cur('contato')}>Contato</a>
@@ -301,7 +312,7 @@ def home():
 <div class="fact"><span class="ic">{icon('badge')}</span><span><strong>Registrada na SUSEP</strong><span>Corretora habilitada, nº {SUSEP}.</span></span></div>
 </div></section>
 
-<section class="section"><div class="wrap">
+<section class="section" id="voce"><div class="wrap">
 <div class="section-head"><div class="txt"><span class="kicker">Para você e sua família</span><h2>Proteção para a casa, o carro e as pessoas que você ama.</h2></div>
 <a class="link-arrow" href="/seguros/">Ver todos os seguros{icon('arrow')}</a></div>
 <div class="mosaic">{tiles_html}</div>
@@ -368,7 +379,7 @@ def seguros():
 <p class="lead">Escolha o que você quer proteger. Em cada seguro, comparamos as seguradoras para o seu perfil e explicamos as diferenças antes de você decidir.</p>
 <div class="hero-actions">{wa_btn()}<a class="btn btn-ghost" href="#empresas">Seguros para empresas</a></div>
 </div></div></div></section>
-<section class="section"><div class="wrap">
+<section class="section" id="voce"><div class="wrap">
 <div class="section-head"><div class="txt"><span class="kicker">Para você e sua família</span><h2>Proteção para o dia a dia.</h2></div></div>
 <div class="catalog">{pes}</div></div></section>
 <section class="section mist" id="empresas"><div class="wrap">
@@ -416,7 +427,7 @@ def product(p):
     ld = [crumbs_ld([('Início', '/'), ('Seguros', '/seguros/'), (p['name'], path)]), faq_ld(p['faq']),
           {"@type": "Service", "name": p['name'], "serviceType": p['name'], "description": p['desc'], "url": SITE + path,
            "provider": {"@id": SITE + "/#organization"}, "areaServed": {"@type": "Country", "name": "Brasil"}}]
-    write(path, page(path, p['title'], p['desc'], 'seguros', body, ld, preload=p['img']))
+    write(path, page(path, p['title'], p['desc'], p['group'], body, ld, preload=p['img']))
 
 
 # ─── SOBRE ───────────────────────────────────────────────────────────────────
