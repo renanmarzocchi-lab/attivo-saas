@@ -452,3 +452,6 @@ a.channel:hover{background:var(--cobalt-soft);color:var(--ink)}
 }
 .more-ic{display:flex;gap:10px;margin-bottom:18px}
 .more-ic svg{width:40px;height:40px;padding:9px;border-radius:12px;background:rgba(255,255,255,.16);color:#fff}
+.covers.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1040px){.covers.cols-4{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.covers.cols-4{grid-template-columns:1fr}}

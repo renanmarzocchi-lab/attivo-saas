@@ -136,8 +136,8 @@ def header(active):
 <a class="brand" href="/" aria-label="ATTIVO Corretora de Seguros, página inicial"><img src="/assets/logo.svg" alt="ATTIVO Corretora de Seguros" width="{round(40*LW/LH)}" height="40"></a>
 <nav class="nav" aria-label="Principal">
 <a href="/"{cur('home')}>Início</a>
-<div class="drop" data-open="false"><button type="button" class="{seg_cur.strip()}" aria-expanded="false" aria-haspopup="true">Seguros{icon('chev')}</button>
-<div class="mega" role="menu">{mega}<a class="all" href="/seguros/">Ver todos os seguros{icon('arrow', 18)}</a></div></div>
+<div class="drop" data-open="false"><button type="button" class="{seg_cur.strip()}" aria-expanded="false">Seguros{icon('chev')}</button>
+<div class="mega">{mega}<a class="all" href="/seguros/">Ver todos os seguros{icon('arrow', 18)}</a></div></div>
 <a href="/seguros/#empresas">Para empresas</a>
 <a href="/sinistro/"{cur('sinistro')}>Sinistro</a>
 <a href="/sobre/"{cur('sobre')}>Sobre</a>
@@ -283,7 +283,7 @@ def home():
 <h1>Seguro bem escolhido, explicado por quem entende.</h1>
 <p class="lead">A ATTIVO é uma corretora independente de Americana. Comparamos as principais seguradoras do país para você, sua família e sua empresa, e seguimos ao seu lado depois da contratação.</p>
 <div class="hero-actions">{wa_btn('Cotar pelo WhatsApp')}<a class="btn btn-ghost" href="/seguros/">Conhecer os seguros</a></div>
-<ul class="hero-proof"><li>{icon('check')}Mais de 8 seguradoras comparadas</li><li>{icon('check')}Cotação gratuita</li><li>{icon('check')}Atendimento em todo o Brasil</li></ul>
+<ul class="hero-proof"><li>{icon('check')}Principais seguradoras do mercado</li><li>{icon('check')}Cotação gratuita</li><li>{icon('check')}Atendimento em todo o Brasil</li></ul>
 </div>
 <div class="hero-media">{pic('hero-familia', 'Família sorrindo na sala de casa', '(max-width:1040px) 100vw, 50vw', eager=True)}
 <div class="hero-badge"><span class="ic">{icon('shield')}</span><span><strong>Do orçamento ao sinistro</strong><span>Uma pessoa que conhece o seu caso</span></span></div></div>
@@ -330,8 +330,7 @@ def home():
 </div></section>
 
 <section class="section mist"><div class="wrap care">
-<div class="care-media"><div class="main">{pic('atendimento-corretor', 'Corretor da ATTIVO conversando com um casal de clientes', '(max-width:1040px) 100vw, 50vw')}</div>
-<div class="quote"><p>“Quando precisei acionar o seguro, estavam lá para ajudar.”</p><span>Roberto C., cliente de seguro auto</span></div></div>
+<div class="care-media"><div class="main">{pic('atendimento-corretor', 'Corretor da ATTIVO conversando com um casal de clientes', '(max-width:1040px) 100vw, 50vw')}</div></div>
 <div><span class="kicker">Atendimento ATTIVO</span><h2>A gente continua com você depois da assinatura.</h2>
 <ul class="checks">
 <li><span class="ic">{icon('check')}</span><span><strong>Uma pessoa que conhece o seu caso</strong><span>Nada de central 0800. Você fala com quem cuidou da sua contratação.</span></span></li>
@@ -342,16 +341,12 @@ def home():
 <a class="btn btn-primary" href="/sobre/">Conhecer a ATTIVO</a></div>
 </div></section>
 
-<section class="section"><div class="wrap">
-<div class="section-head"><div class="txt"><span class="kicker">Depoimentos</span><h2>Quem já é cliente recomenda.</h2></div></div>
-{review_cards()}
-</div></section>
 
 {faq_block('Antes de falar com a gente.', HOME_FAQ)}
 {cta_final()}
 '''
-    write('/', page('/', 'ATTIVO Corretora de Seguros | Seguro auto, vida, residencial, saúde e empresarial',
-                    'Corretora de seguros independente em Americana/SP. Comparamos as principais seguradoras para você, sua família e sua empresa, com atendimento do orçamento ao sinistro.',
+    write('/', page('/', 'ATTIVO Corretora de Seguros | Americana/SP e todo o Brasil',
+                    'Corretora independente em Americana/SP. Seguro auto, residencial, vida, saúde e empresarial comparando as principais seguradoras, do orçamento ao sinistro.',
                     'home', body, [faq_ld(HOME_FAQ)], preload='hero-familia'))
 
 
@@ -404,7 +399,7 @@ def product(p):
 </div>{media}</div></div></section>
 <section class="section" id="coberturas"><div class="wrap">
 <div class="section-head"><div class="txt"><span class="kicker">{p["name"]}</span><h2>O que pode estar coberto.</h2><p class="lead">Cada seguradora tem regras próprias. Na cotação mostramos exatamente o que entra em cada proposta.</p></div></div>
-<div class="covers">{covers}</div>
+<div class="covers{' cols-4' if len(p['covers']) == 4 else ''}">{covers}</div>
 </div></section>
 <section class="section mist"><div class="wrap split">
 <div><span class="kicker">Como montamos a sua cotação</span><h2>O que analisamos antes de recomendar.</h2>
@@ -454,17 +449,16 @@ def sobre():
 <div><span class="kicker">Nosso jeito de trabalhar</span><h2>Do orçamento ao sinistro, com a mesma pessoa.</h2>
 <div style="margin-top:28px">{STEPS.replace('class="steps"', 'class="steps" style="grid-template-columns:1fr;gap:30px"')}</div></div>
 </div></section>
-<section class="section mist"><div class="wrap"><div class="section-head"><div class="txt"><span class="kicker">Depoimentos</span><h2>O que dizem nossos clientes.</h2></div></div>{review_cards()}</div></section>
 {cta_final()}
 '''
-    write('/sobre/', page('/sobre/', 'Sobre a ATTIVO | Corretora de seguros independente em Americana/SP',
+    write('/sobre/', page('/sobre/', 'Sobre a ATTIVO | Corretora independente em Americana/SP',
                           'Conheça a ATTIVO Corretora de Seguros: independente, com base em Americana/SP, registrada na SUSEP e com atendimento do orçamento ao sinistro.',
                           'sobre', body, [crumbs_ld([('Início', '/'), ('Sobre', '/sobre/')])], preload='consultoria-casal'))
 
 
 # ─── CONTATO ─────────────────────────────────────────────────────────────────
 def contato():
-    qas = [('Quanto tempo leva para receber a cotação?', 'Na maioria dos casos respondemos no mesmo dia útil. Seguros empresariais e de vida mais complexos podem levar um pouco mais.'),
+    qas = [('Quanto tempo leva para receber a cotação?', 'Procuramos responder no mesmo dia útil. Seguros empresariais e de vida mais complexos podem levar um pouco mais, porque dependem de análise das seguradoras.'),
            ('Posso ser atendido fora de Americana?', 'Sim. Atendemos clientes de todo o Brasil pelo WhatsApp, telefone e e-mail.'),
            ('Preciso enviar documentos agora?', 'Não. Para começar basta conversar. Pedimos documentos só quando você decidir contratar.')]
     body = f'''
