@@ -13,14 +13,14 @@ from icons import icon, WHATSAPP
 SCR = os.path.join(HERE, '..')
 OUT = os.path.join(SCR, 'site2')
 SITE = 'https://attivocorretora.com.br'
-V = '4'
+V = '5'
 import re as _re
 def _dims(f):
     vb = _re.search(r'viewBox="([^"]+)"', open(os.path.join(HERE, 'static', 'assets', f)).read()).group(1).split()
     return float(vb[2]), float(vb[3])
 LW, LH = _dims('logo.svg')
 NW, NH = _dims('logo-negativo.svg')
-LASTMOD = '2026-10-30'
+LASTMOD = '2026-10-31'
 WA_MSG = 'Olá! Vim pelo site da ATTIVO e gostaria de falar com um especialista.'
 
 
@@ -90,7 +90,7 @@ def head(path, title, desc, ld=None, robots='index,follow,max-image-preview:larg
 <meta name="description" content="{d}">
 <meta name="robots" content="{robots}">
 <link rel="canonical" href="{SITE}{path}">
-<meta name="theme-color" content="#0A2540">
+<meta name="theme-color" content="#0B2A4A">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:site_name" content="ATTIVO Corretora de Seguros">
@@ -108,7 +108,7 @@ def head(path, title, desc, ld=None, robots='index,follow,max-image-preview:larg
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Figtree:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/attivo.css?v={V}">
 {pre}
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZNM2R7XQVC"></script>
@@ -145,7 +145,7 @@ def header(active):
 <span class="topbar-links"><a href="/sinistro/">{icon('lifebuoy')}Precisa acionar o seguro?</a><a href="tel:{PHONE_TEL}">{icon('phone')}{PHONE}</a><a class="hide-sm" href="mailto:{EMAIL}">{icon('mail')}{EMAIL}</a></span>
 </div></div>
 <header class="header"><div class="wrap">
-<a class="brand" href="/" aria-label="ATTIVO Corretora de Seguros, página inicial"><img src="/assets/logo.svg" alt="ATTIVO Corretora de Seguros" width="{round(40*LW/LH)}" height="40"></a>
+<a class="brand" href="/" aria-label="ATTIVO Corretora de Seguros, página inicial"><img src="/assets/logo.svg" alt="ATTIVO Corretora de Seguros" width="{round(46*LW/LH)}" height="46"></a>
 <nav class="nav" aria-label="Principal">
 <a href="/"{cur('home')}>Início</a>
 {drop_pes}
@@ -161,7 +161,7 @@ def header(active):
 </div>
 </div></header>
 <div class="mobile-menu" id="menu-mobile" data-open="false" role="dialog" aria-modal="true" aria-label="Menu">
-<div class="mm-head"><img src="/assets/logo.svg" alt="ATTIVO" width="{round(34*LW/LH)}" height="34" style="height:34px;width:auto"><button class="menu-btn mm-close" type="button" aria-label="Fechar menu">{icon('x')}</button></div>
+<div class="mm-head"><img src="/assets/logo.svg" alt="ATTIVO" width="{round(38*LW/LH)}" height="38" style="height:38px;width:auto"><button class="menu-btn mm-close" type="button" aria-label="Fechar menu">{icon('x')}</button></div>
 <nav aria-label="Menu mobile">
 <a href="/">Início</a><a href="/sinistro/">Precisa acionar o seguro?</a><a href="/sobre/">Sobre a ATTIVO</a><a href="/contato/">Contato</a>
 <div class="group">Para você</div>{mm_items(pes)}
@@ -179,8 +179,14 @@ def footer():
     li = lambda lst: ''.join(f'<li><a href="/{p["slug"]}/">{p["name"]}</a></li>' for p in lst)
     return f'''</main>
 <footer class="footer"><div class="wrap">
+<div class="footer-contact">
+<div class="fc"><span class="ic">{icon('pin')}</span><span><small>Base</small><strong>Americana/SP, atendimento em todo o Brasil</strong></span></div>
+<div class="fc"><span class="ic">{icon('clock')}</span><span><small>Horário</small><strong>{HOURS}</strong></span></div>
+<a class="fc" href="https://wa.me/5519994241018" data-wa="{esc(WA_MSG)}"><span class="ic">{icon('phone')}</span><span><small>WhatsApp e telefone</small><strong>{PHONE}</strong></span></a>
+<a class="fc" href="mailto:{EMAIL}"><span class="ic">{icon('mail')}</span><span><small>E-mail</small><strong>{EMAIL}</strong></span></a>
+</div>
 <div class="footer-top">
-<div><a class="brand" href="/" aria-label="ATTIVO, página inicial"><img src="/assets/logo-negativo.svg" alt="ATTIVO Corretora de Seguros" width="{round(56*NW/NH)}" height="56"></a>
+<div><a class="brand" href="/" aria-label="ATTIVO, página inicial"><img src="/assets/logo-negativo.svg" alt="ATTIVO Corretora de Seguros" width="{round(52*NW/NH)}" height="52"></a>
 <p>Corretora de seguros independente. Comparamos as principais seguradoras e cuidamos de você do orçamento ao sinistro.</p>
 <span class="susep">{icon('badge')}Corretora registrada na SUSEP nº {SUSEP}</span></div>
 <div><h4>Para você</h4><ul>{li(pes)}</ul></div>
@@ -289,16 +295,14 @@ def home():
     emp = [p for p in PRODUCTS if p['group'] == 'empresa'] + [BY_SLUG['plano-de-saude']]
     biz_items = ''.join(f'<a class="biz-item" href="/{p["slug"]}/"><span class="ic">{icon(p["icon"])}</span><span><strong>{"Saúde e odonto para equipes" if p["slug"] == "plano-de-saude" else p["name"]}</strong><span>{p["short"]}</span></span></a>' for p in emp)
     body = f'''
-<section class="hero"><div class="wrap hero-grid">
-<div class="hero-copy">
+<section class="hero"><div class="hero-bg">{pic('hero-familia', 'Família sorrindo na sala de casa', '100vw', eager=True)}</div>
+<div class="wrap"><div class="hero-copy">
+<span class="eyebrow">Corretora de seguros independente</span>
 <h1>Seguro bem escolhido, explicado por quem entende.</h1>
-<p class="lead">A ATTIVO é uma corretora independente de Americana. Comparamos as principais seguradoras do país para você, sua família e sua empresa, e seguimos ao seu lado depois da contratação.</p>
-<div class="hero-actions">{wa_btn('Cotar pelo WhatsApp')}<a class="btn btn-ghost" href="/seguros/">Conhecer os seguros</a></div>
+<p class="lead">Comparamos as principais seguradoras do país para você, sua família e sua empresa, e seguimos ao seu lado depois da contratação.</p>
+<div class="hero-actions">{wa_btn('Cotar pelo WhatsApp')}<a class="btn btn-outline-light" href="/seguros/">Conhecer os seguros</a></div>
 <ul class="hero-proof"><li>{icon('check')}Principais seguradoras do mercado</li><li>{icon('check')}Cotação gratuita</li><li>{icon('check')}Atendimento em todo o Brasil</li></ul>
-</div>
-<div class="hero-media">{pic('hero-familia', 'Família sorrindo na sala de casa', '(max-width:1040px) 100vw, 50vw', eager=True)}
-<div class="hero-badge"><span class="ic">{icon('shield')}</span><span><strong>Do orçamento ao sinistro</strong><span>Uma pessoa que conhece o seu caso</span></span></div></div>
-</div></section>
+</div></div></section>
 
 <section class="picker" aria-labelledby="picker-t"><div class="wrap"><div class="picker-box">
 <div class="picker-head"><h2 id="picker-t">O que você quer proteger?</h2><p>Escolha e veja como funciona, ou fale direto com a gente.</p></div>
@@ -339,6 +343,11 @@ def home():
 <div class="section-head"><div class="txt"><span class="kicker">Como funciona</span><h2>Simples para você, trabalho para a gente.</h2></div></div>
 {STEPS}
 </div></section>
+
+<section class="banner"><div class="banner-bg">{pic('consultoria-casal', 'Casal conversando com a corretora sobre o seguro', '100vw')}</div>
+<div class="wrap"><div class="banner-box"><span class="eyebrow">Do orçamento ao sinistro</span><h2>Você fala sempre com quem conhece o seu caso.</h2>
+<p>Sem central de atendimento e sem robô. Uma corretora que acompanha a sua apólice de perto, ano após ano.</p>
+<div class="hero-actions">{wa_btn('Falar com a ATTIVO')}<a class="btn btn-outline-light" href="/sinistro/">Como acionar o seguro</a></div></div></div></section>
 
 <section class="section mist"><div class="wrap care">
 <div class="care-media"><div class="main">{pic('atendimento-corretor', 'Corretor da ATTIVO conversando com um casal de clientes', '(max-width:1040px) 100vw, 50vw')}</div></div>
